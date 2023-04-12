@@ -17,7 +17,7 @@ const stripSRT = (srt: string) => {
 };
 
 const reconstructSRT = (timestamps: string[], translatedText: string) => {
-  const translatedLines = translatedText.split(" | ");
+  const translatedLines = translatedText.split("|");
   let srt = "";
 
   for (let i = 0; i < timestamps.length; i++) {
@@ -28,33 +28,30 @@ const reconstructSRT = (timestamps: string[], translatedText: string) => {
 };
 
 const processTranslation = async (text: string, language: string) => {
-  const prompt = `Translate to ${language}, making sure to preserve the meaning (without doing a literal translation). Keep the "|"s:`;
+  const prompt = `Translate to ${language}, making sure to preserve the meaning (without doing a literal translation). Keep the "|"s:\n\n${text}`;
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer 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`,
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: prompt,
+          content: "Translate text:",
         },
         {
           role: "user",
-          content: `The text to be translated is: ${text}`,
+          content: prompt,
         },
       ],
-      max_tokens: 4096,
-      temperature: 0.0,
     }),
   });
 
   if (res.status !== 200) {
-    console.log(res);
     throw new Error("OpenAI API returned an error");
   }
 
