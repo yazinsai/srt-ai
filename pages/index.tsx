@@ -4,6 +4,15 @@ import Form from "@/components/Form";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const triggerFileDownload = (filename: string, content: string) => {
+  const element = document.createElement("a");
+  const file = new Blob([content], { type: "text/plain" });
+  element.href = URL.createObjectURL(file);
+  element.download = filename;
+  document.body.appendChild(element);
+  element.click();
+};
+
 export default function Home() {
   async function handleSubmit(content: string, language: string) {
     try {
@@ -15,6 +24,9 @@ export default function Home() {
 
       if (response.ok) {
         const data = await response.json();
+        const translatedSrt = data.translatedSrt;
+        const filename = `${language}.srt`;
+        triggerFileDownload(filename, translatedSrt);
         console.log("Translation result:", data);
       } else {
         console.error(
