@@ -2,19 +2,38 @@
 import React, { FormEvent, useState } from "react";
 
 interface Props {
-  onSubmit: (srtFile: File, language: string) => void;
+  onSubmit: (content: string, language: string) => void;
 }
 
 const LANGUAGES = ["Arabic", "English", "Spanish", "French", "German"];
+
+// src/utils/fileReader.ts
+const readFileContents = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      resolve(content);
+    };
+
+    reader.onerror = (e) => {
+      reject(e);
+    };
+
+    reader.readAsText(file);
+  });
+};
 
 const SrtForm: React.FC<Props> = ({ onSubmit }) => {
   const [file, setFile] = useState<File>();
   const [language, setLanguage] = useState<string>("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (file && language) {
-      onSubmit(file, language);
+      const content = await readFileContents(file);
+      onSubmit(content, language);
     }
   };
 

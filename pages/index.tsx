@@ -5,8 +5,28 @@ import Form from "@/components/Form";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  function handleSubmit(file: File, language: string) {
-    console.log("Submitted", file, language);
+  async function handleSubmit(content: string, language: string) {
+    try {
+      const response = await fetch("/api/translate", {
+        method: "POST",
+        body: JSON.stringify({ content, language }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Translation result:", data);
+      } else {
+        console.error(
+          "Error occurred while submitting the translation request"
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Error during file reading and translation request:",
+        error
+      );
+    }
   }
 
   return (
