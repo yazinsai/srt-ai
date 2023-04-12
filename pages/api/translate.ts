@@ -37,7 +37,7 @@ const processTranslation = async (text: string, language: string) => {
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-0314",
       messages: [
         {
           role: "system",
