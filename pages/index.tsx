@@ -21,17 +21,21 @@ export default function Home() {
     const data = response.body;
     if (!data) return;
 
+    let content = "";
+    let doneReading = false;
     const reader = data.getReader();
     const decoder = new TextDecoder();
-    let doneReading = false;
 
     while (!doneReading) {
       const { value, done } = await reader.read();
       doneReading = done;
       const chunk = decoder.decode(value);
 
+      content += chunk;
       setTranslatedSrt((prev) => prev + chunk);
     }
+
+    return content;
   }
 
   async function handleSubmit(content: string, language: string) {
@@ -43,9 +47,13 @@ export default function Home() {
       });
 
       if (response.ok) {
-        await handleStream(response);
+        const content = await handleStream(response);
         const filename = `${language}.srt`;
-        triggerFileDownload(filename, translatedSrt);
+        if (content) {
+          triggerFileDownload(filename, content);
+        } else {
+          alert("Error occurred while reading the file");
+        }
       } else {
         console.error(
           "Error occurred while submitting the translation request"
