@@ -29,7 +29,6 @@ const retrieveTranslation = async (
   language: string,
   timestamps: string[]
 ) => {
-  console.log("Retrieving translation for", text, "in", language);
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
