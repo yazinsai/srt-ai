@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import Form from "@/components/Form";
+import React from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,6 +15,25 @@ const triggerFileDownload = (filename: string, content: string) => {
 };
 
 export default function Home() {
+  const [translatedSrt, setTranslatedSrt] = React.useState("");
+
+  async function handleStream(response: any) {
+    const data = response.body;
+    if (!data) return;
+
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    let doneReading = false;
+
+    while (!doneReading) {
+      const { value, done } = await reader.read();
+      doneReading = done;
+      const chunk = decoder.decode(value);
+
+      setTranslatedSrt((prev) => prev + chunk);
+    }
+  }
+
   async function handleSubmit(content: string, language: string) {
     try {
       const response = await fetch("/api/translate", {
@@ -23,11 +43,9 @@ export default function Home() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        const translatedSrt = data.translatedSrt;
+        await handleStream(response);
         const filename = `${language}.srt`;
         triggerFileDownload(filename, translatedSrt);
-        console.log("Translation result:", data);
       } else {
         console.error(
           "Error occurred while submitting the translation request"
@@ -44,6 +62,9 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Form onSubmit={handleSubmit} />
+      <hr />
+      Answer below:
+      {translatedSrt}
     </main>
   );
 }
