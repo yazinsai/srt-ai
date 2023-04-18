@@ -1,9 +1,11 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import Form from "@/components/Form";
 import React from "react";
-
+import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
+
+import Form from "@/components/Form";
+import Timestamp from "@/components/Timestamp";
+
+import type { Chunk } from "@/types";
 
 const triggerFileDownload = (filename: string, content: string) => {
   const element = document.createElement("a");
@@ -16,6 +18,7 @@ const triggerFileDownload = (filename: string, content: string) => {
 
 export default function Home() {
   const [translatedSrt, setTranslatedSrt] = React.useState("");
+  const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
 
   async function handleStream(response: any) {
     const data = response.body;
@@ -33,9 +36,17 @@ export default function Home() {
 
       content += chunk;
       setTranslatedSrt((prev) => prev + chunk);
+      if (chunk.trim().length)
+        setTranslatedChunks((prev) => [...prev, parseChunk(chunk)]);
     }
 
     return content;
+
+    function parseChunk(chunkStr: string): Chunk {
+      const [index, timestamps, text] = chunkStr.split("\n");
+      const [start, end] = timestamps.split(" --> ");
+      return { index, start, end, text };
+    }
   }
 
   async function handleSubmit(content: string, language: string) {
@@ -68,11 +79,15 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col justify-between p-24">
       <Form onSubmit={handleSubmit} />
       <hr />
-      Answer below:
-      {translatedSrt}
+      Translated transcript below:
+      <div className="flex flex-col gap-y-2">
+        {translatedChunks.map((chunk, id) => (
+          <Timestamp key={id} {...chunk} />
+        ))}
+      </div>
     </main>
   );
 }

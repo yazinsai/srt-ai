@@ -74,7 +74,9 @@ const streamFromResponse = (
   let index = 0;
 
   const reconstructPartialSRT = (text: string) => {
-    const reconstructedSRT = `${index + 1}\n${timestamps[index]}\n${text}\n\n`;
+    const reconstructedSRT = `${index + 1}\n${
+      timestamps[index]
+    }\n${text.trim()}\n\n`;
     index++;
     return reconstructedSRT;
   };

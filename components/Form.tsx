@@ -74,7 +74,7 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         onDrop={handleDrop}
         className={`w-64 h-32 border-2 ${
           dragging ? "border-blue-300" : "border-gray-300"
-        } rounded-lg flex items-center justify-center cursor-pointer`}
+        } rounded-lg flex items-center justify-center cursor-pointer relative`}
       >
         {file ? (
           <p>{file.name}</p>
@@ -91,11 +91,8 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
           style={{ width: "100%", height: "100%" }}
         />
       </div>
-      <label htmlFor="language" className="block font-bold text-xl">
-        Language:
-      </label>
+
       <select
-        id="language"
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
         className="bg-white py-2 px-4 border border-gray-300 rounded-lg"
