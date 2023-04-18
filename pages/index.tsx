@@ -1,5 +1,5 @@
 import React from "react";
-import { libre } from "@/fonts";
+import { libre, roaldDahl } from "@/fonts";
 
 import Form from "@/components/Form";
 import Timestamp from "@/components/Timestamp";
@@ -88,6 +88,14 @@ export default function Home() {
         libre.className
       )}
     >
+      <h1
+        className={classNames(
+          "px-4 text-3xl md:text-5xl text-center font-bold my-6",
+          roaldDahl.className
+        )}
+      >
+        Translate any SRT, to any language
+      </h1>
       <Form onSubmit={handleSubmit} />
       <div className="flex flex-col gap-y-2">
         {translatedChunks.map((chunk, id) => (

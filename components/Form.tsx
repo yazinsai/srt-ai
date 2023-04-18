@@ -4,6 +4,9 @@ import Image from "next/image";
 interface Props {
   onSubmit: (content: string, language: string) => void;
 }
+function classNames(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const LANGUAGES = [
   "Arabic",
@@ -60,13 +63,13 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full px-4 mt-6 space-y-4 md:px-0"
+      className="flex flex-col w-full px-4 mt-6 md:px-0"
     >
       <label
         htmlFor="srt-file"
-        className="block font-bold md:pl-8 text-lg text-[#444444]"
+        className="block font-bold py-4 md:pl-8 text-lg text-[#444444]"
       >
-        Step 1: Choose your SRT file
+        {file ? "✅" : "👉"} Step 1: Choose your SRT file
       </label>
       <div
         id="srt-file"
@@ -86,16 +89,23 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
           onChange={(e) => setFile(e.target.files![0])}
           className="absolute inset-0 opacity-0 cursor-pointer"
         />
-        <div className="grid items-center md:grid-cols-2">
-          <div className="relative hidden mx-auto -bottom-8 md:block">
-            <Image
-              src="/fire-chicken.png"
-              alt="Chicken on fire"
-              width={256}
-              height={400}
-              priority
-            />
-          </div>
+        <div
+          className={classNames(
+            "grid items-center",
+            file ? "md:py-4" : "md:grid-cols-2"
+          )}
+        >
+          {!file && (
+            <div className="relative hidden mx-auto -bottom-8 md:block">
+              <Image
+                src="/fire-chicken.png"
+                alt="Chicken on fire"
+                width={256}
+                height={400}
+                priority
+              />
+            </div>
+          )}
           <div>
             <div className="text-center py-4 md:py-0 text-[#444444]">
               {file ? (
@@ -118,37 +128,41 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
 
       <div className="md:h-6"></div>
 
-      <label
-        htmlFor="srt-file"
-        className="block font-bold md:pl-8 text-lg text-[#444444]"
-      >
-        Step 2: Select a Target language
-      </label>
-      <div className="rounded-lg bg-[#fafafa] text-[#444444] py-4 md:py-8 md:px-8 relative md:flex items-center text-center md:text-left">
-        <div>Translate this SRT file to</div>
-        <select
-          id="language"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="px-4 py-2 mt-4 ml-2 bg-white border border-gray-300 rounded-lg md:mt-0"
-        >
-          <option value="">Choose language&hellip;</option>
-          {LANGUAGES.map((lang, i) => (
-            <option key={i} value={lang}>
-              {lang}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="h-2"></div>
-
-      <button
-        disabled={!file || !language}
-        className="bg-[#444444] hover:bg-[#3a3a3a] text-white mt-6 font-bold py-2 px-6 rounded-lg disabled:bg-[#eeeeee] disabled:text-[#aaaaaa]"
-      >
-        Translate {language ? `to ${language}` : `SRT`} &rarr;
-      </button>
+      {file && (
+        <>
+          <div>
+            <label
+              htmlFor="srt-file"
+              className="block font-bold md:pl-8 mt-6 md:mt-2 py-4 text-lg text-[#444444]"
+            >
+              {language ? "✅" : "👉"} Step 2: Select a Target language
+            </label>
+            <div className="rounded-lg bg-[#fafafa] text-[#444444] py-4 md:py-8 md:px-8 relative md:flex items-center text-center md:text-left">
+              <div>Translate this SRT file to</div>
+              <select
+                id="language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="px-4 py-2 mt-4 ml-2 bg-white border border-gray-300 rounded-lg md:mt-0"
+              >
+                <option value="">Choose language&hellip;</option>
+                {LANGUAGES.map((lang, i) => (
+                  <option key={i} value={lang}>
+                    {lang}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="h-2"></div>
+          </div>
+          <button
+            disabled={!file || !language}
+            className="bg-[#444444] hover:bg-[#3a3a3a] text-white mt-6 font-bold py-2 px-6 rounded-lg disabled:bg-[#eeeeee] disabled:text-[#aaaaaa]"
+          >
+            Translate {language ? `to ${language}` : `SRT`} &rarr;
+          </button>
+        </>
+      )}
     </form>
   );
 };
