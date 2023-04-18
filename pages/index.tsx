@@ -125,6 +125,7 @@ export default function Home() {
           >
             Translating&hellip;
           </h1>
+          <p>(The file will automatically download when it's done)</p>
           <Translating chunks={translatedChunks} />
         </>
       )}
