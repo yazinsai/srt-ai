@@ -54,9 +54,16 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === "application/x-subrip") {
-        setFile(droppedFile);
+
+      // Make sure the file extension is ".srt"
+      const fileName = droppedFile.name;
+      const fileExtension = fileName.split(".").pop();
+      if (fileExtension !== "srt") {
+        alert("Please upload a .srt file");
+        return;
       }
+
+      setFile(droppedFile);
     }
   };
 

@@ -19,7 +19,18 @@ const triggerFileDownload = (filename: string, content: string) => {
   element.click();
 };
 
+function Translating({ chunks }: { chunks: Chunk[] }) {
+  return (
+    <div className="flex flex-col gap-y-2">
+      {chunks.map((chunk, id) => (
+        <Timestamp key={id} {...chunk} />
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
+  const [status, setStatus] = React.useState<"idle" | "busy" | "done">("idle");
   const [translatedSrt, setTranslatedSrt] = React.useState("");
   const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
 
@@ -54,6 +65,7 @@ export default function Home() {
 
   async function handleSubmit(content: string, language: string) {
     try {
+      setStatus("busy");
       const response = await fetch("/api/translate", {
         method: "POST",
         body: JSON.stringify({ content, language }),
@@ -64,6 +76,7 @@ export default function Home() {
         const content = await handleStream(response);
         const filename = `${language}.srt`;
         if (content) {
+          setStatus("done");
           triggerFileDownload(filename, content);
         } else {
           alert("Error occurred while reading the file");
@@ -74,6 +87,7 @@ export default function Home() {
         );
       }
     } catch (error) {
+      setStatus("idle");
       console.error(
         "Error during file reading and translation request:",
         error
@@ -88,20 +102,45 @@ export default function Home() {
         libre.className
       )}
     >
-      <h1
-        className={classNames(
-          "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-          roaldDahl.className
-        )}
-      >
-        Translate any SRT, to any language
-      </h1>
-      <Form onSubmit={handleSubmit} />
-      <div className="flex flex-col gap-y-2">
-        {translatedChunks.map((chunk, id) => (
-          <Timestamp key={id} {...chunk} />
-        ))}
-      </div>
+      {status == "idle" && (
+        <>
+          <h1
+            className={classNames(
+              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
+              roaldDahl.className
+            )}
+          >
+            Translate any SRT, to any language
+          </h1>
+          <Form onSubmit={handleSubmit} />
+        </>
+      )}
+      {status == "busy" && (
+        <>
+          <h1
+            className={classNames(
+              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
+              roaldDahl.className
+            )}
+          >
+            Translating&hellip;
+          </h1>
+          <Translating chunks={translatedChunks} />
+        </>
+      )}
+      {status == "done" && (
+        <>
+          <h1
+            className={classNames(
+              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
+              roaldDahl.className
+            )}
+          >
+            All done!
+          </h1>
+          <p>Check your "Downloads" folder 🍿</p>
+        </>
+      )}
     </main>
   );
 }
