@@ -58,10 +58,13 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col w-full px-4 mt-6 space-y-4 md:px-0"
+    >
       <label
         htmlFor="srt-file"
-        className="block font-bold pl-8 text-lg text-[#444444]"
+        className="block font-bold md:pl-8 text-lg text-[#444444]"
       >
         Step 1: Choose your SRT file
       </label>
@@ -75,16 +78,16 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         onDrop={handleDrop}
         className={`w-full border-2 ${
           dragging ? "border-blue-300" : "border-transparent"
-        } rounded-lg bg-[#EFEFEF] px-12 relative`}
+        } md:rounded-lg bg-[#EFEFEF] px-12 relative`}
       >
         <input
           type="file"
           accept=".srt"
           onChange={(e) => setFile(e.target.files![0])}
-          className="absolute opacity-0 cursor-pointer inset-0"
+          className="absolute inset-0 opacity-0 cursor-pointer"
         />
-        <div className="grid grid-cols-2 items-center">
-          <div className="relative mx-auto -bottom-8">
+        <div className="grid items-center md:grid-cols-2">
+          <div className="relative hidden mx-auto -bottom-8 md:block">
             <Image
               src="/fire-chicken.png"
               alt="Chicken on fire"
@@ -94,15 +97,17 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
             />
           </div>
           <div>
-            <div className="text-center text-[#444444]">
+            <div className="text-center py-4 md:py-0 text-[#444444]">
               {file ? (
                 `📂 ${file.name}`
               ) : (
                 <>
-                  <div>Drop it like it&lsquo;s hot</div>
-                  <div className="my-3 text-sm">- or -</div>
+                  <div className="hidden md:block">
+                    <div>Drop it like it&lsquo;s hot</div>
+                    <div className="my-3 text-sm">- or -</div>
+                  </div>
                   <div className="rounded-sm bg-[#d9d9d9] py-2 px-2">
-                    Browse for file&hellip;
+                    Browse for SRT file&hellip;
                   </div>
                 </>
               )}
@@ -111,23 +116,23 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         </div>
       </div>
 
-      <div className="h-2"></div>
+      <div className="md:h-6"></div>
 
       <label
         htmlFor="srt-file"
-        className="block font-bold pl-8 text-lg text-[#444444]"
+        className="block font-bold md:pl-8 text-lg text-[#444444]"
       >
-        Step 2: Target language
+        Step 2: Select a Target language
       </label>
-      <div className="rounded-lg bg-[#EFEFEF] text-[#444444] py-8 px-8 relative flex items-center">
-        <div>I'd like this file translated to</div>
+      <div className="rounded-lg bg-[#fafafa] text-[#444444] py-4 md:py-8 md:px-8 relative md:flex items-center text-center md:text-left">
+        <div>Translate this SRT file to</div>
         <select
           id="language"
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="ml-2 bg-white py-2 px-4 border border-gray-300 rounded-lg"
+          className="px-4 py-2 mt-4 ml-2 bg-white border border-gray-300 rounded-lg md:mt-0"
         >
-          <option value="">Select a language</option>
+          <option value="">Choose language&hellip;</option>
           {LANGUAGES.map((lang, i) => (
             <option key={i} value={lang}>
               {lang}
@@ -135,11 +140,14 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
           ))}
         </select>
       </div>
+
+      <div className="h-2"></div>
+
       <button
         disabled={!file || !language}
         className="bg-[#444444] hover:bg-[#3a3a3a] text-white mt-6 font-bold py-2 px-6 rounded-lg disabled:bg-[#eeeeee] disabled:text-[#aaaaaa]"
       >
-        Translate SRT &rarr;
+        Translate {language ? `to ${language}` : `SRT`} &rarr;
       </button>
     </form>
   );
