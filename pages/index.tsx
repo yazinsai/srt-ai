@@ -1,11 +1,14 @@
 import React from "react";
-import { Inter } from "next/font/google";
-const inter = Inter({ subsets: ["latin"] });
+import { libre } from "@/fonts";
 
 import Form from "@/components/Form";
 import Timestamp from "@/components/Timestamp";
 
 import type { Chunk } from "@/types";
+
+function classNames(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const triggerFileDownload = (filename: string, content: string) => {
   const element = document.createElement("a");
@@ -79,10 +82,13 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col justify-between p-24">
+    <main
+      className={classNames(
+        "max-w-2xl flex flex-col items-center mx-auto",
+        libre.className
+      )}
+    >
       <Form onSubmit={handleSubmit} />
-      <hr />
-      Translated transcript below:
       <div className="flex flex-col gap-y-2">
         {translatedChunks.map((chunk, id) => (
           <Timestamp key={id} {...chunk} />
