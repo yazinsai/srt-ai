@@ -140,6 +140,15 @@ export default function Home() {
             All done!
           </h1>
           <p>Check your "Downloads" folder 🍿</p>
+          <p className="mt-4 text-[#444444]">
+            Psst. Need to edit your SRT? Try{" "}
+            <a
+              href="https://www.veed.io/subtitle-tools/edit?locale=en&source=/tools/subtitle-editor/srt-editor"
+              target="_blank"
+            >
+              this tool
+            </a>
+          </p>
         </>
       )}
     </main>
