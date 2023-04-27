@@ -1,3 +1,5 @@
+![SRT AI Translator - Preview](/preview.png)
+
 # SRT AI Translator
 
 Translate SRT files to any language, using AI magic ✨
