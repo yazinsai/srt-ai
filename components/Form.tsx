@@ -13,6 +13,7 @@ const LANGUAGES = [
   "English",
   "French",
   "German",
+  "Persian", 
   "Malay",
   "Spanish",
   "Turkish",
