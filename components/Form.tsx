@@ -9,15 +9,21 @@ function classNames(...classes: any[]) {
 }
 
 const LANGUAGES = [
-  "Arabic",
-  "English",
-  "French",
-  "German",
-  "Persian",
-  "Malay",
-  "Spanish",
-  "Turkish",
-];
+  'Mandarin Chinese', 'Spanish', 'English', 'Hindi', 'Bengali', 'Portuguese', 'Russian',
+  'Japanese', 'Punjabi', 'Marathi', 'Telugu', 'Wu Chinese', 'Turkish', 'Korean',
+  'French', 'German', 'Vietnamese', 'Tamil', 'Yue Chinese', 'Urdu', 'Javanese', 'Italian',
+  'Arabic', 'Gujarati', 'Persian', 'Bhojpuri', 'Min Nan', 'Hakka',
+  'Jin Chinese', 'Hausa', 'Kannada', 'Indonesian', 'Polish', 'Yoruba', 'Xiang Chinese',
+  'Malayalam', 'Odia', 'Maithili', 'Burmese', 'Sunda', 'Ukrainian',
+  'Igbo', 'Uzbek', 'Sindhi', 'Romanian', 'Tagalog', 'Dutch',
+  'Amharic', 'Pashto', 'Magahi', 'Thai', 'Saraiki', 'Khmer',
+  'Somali', 'Malay', 'Cebuano', 'Nepali', 'Assamese', 'Sinhalese',
+  'Kurdish', 'Fulfulde', 'Greek', 'Chittagonian', 'Kazakh', 'Hungarian',
+  'Kinyarwanda', 'Zulu', 'Czech', 'Uyghur', 'Hmong', 'Shona',
+  'Quechua', 'Belarusian', 'Balochi', 'Konkani', 'Armenian', 'Azerbaijani',
+  'Bashkir', 'Luxembourgish', 'Tibetan', 'Tigrinya', 'Turkmen', 'Kashmiri',
+  'Malagasy', 'Kirghiz', 'Tatar', 'Tonga', 'Tswana', 'Esperanto'
+].sort()
 
 const readFileContents = async (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
