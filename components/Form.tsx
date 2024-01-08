@@ -16,6 +16,7 @@ const LANGUAGES = [
   'Jin Chinese', 'Hausa', 'Kannada', 'Indonesian', 'Polish', 'Yoruba', 'Xiang Chinese',
   'Malayalam', 'Odia', 'Maithili', 'Burmese', 'Sunda', 'Ukrainian',
   'Igbo', 'Uzbek', 'Sindhi', 'Romanian', 'Tagalog', 'Dutch',
+  'Danish', 'Finnish', 'Norwegian', 'Swedish',
   'Amharic', 'Pashto', 'Magahi', 'Thai', 'Saraiki', 'Khmer',
   'Somali', 'Malay', 'Cebuano', 'Nepali', 'Assamese', 'Sinhalese',
   'Kurdish', 'Fulfulde', 'Greek', 'Chittagonian', 'Kazakh', 'Hungarian',
