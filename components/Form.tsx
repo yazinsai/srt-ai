@@ -1,3 +1,5 @@
+'use client';
+
 import React, { FormEvent, useState } from "react";
 import Image from "next/image";
 
