@@ -66,7 +66,7 @@ export default function Home() {
   async function handleSubmit(content: string, language: string) {
     try {
       setStatus("busy");
-      const response = await fetch("/api/translate", {
+      const response = await fetch("/api", {
         method: "POST",
         body: JSON.stringify({ content, language }),
         headers: { "Content-Type": "application/json" },
