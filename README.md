@@ -23,7 +23,7 @@ Follow these simple steps to set up SRT AI Translator and start enjoying better 
 
 1. Clone the repo `git clone https://github.com/yazinsai/srt-ai`
 2. Rename `.env.example` to `.env.local` and paste your OpenAI Key.
-3. Install dependencies using `npm run install`
+3. Install dependencies using `npm install`
 4. Start locally using `npm run dev`
 
 You should now be able to access the repo at [`http://localhost:3000/`](http://localhost:3000/) in your browser.
