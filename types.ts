@@ -4,3 +4,9 @@ export interface Chunk {
   end: string;
   text: string;
 }
+
+export type Segment = {
+  id: number;
+  timestamp: string;
+  text: string;
+}

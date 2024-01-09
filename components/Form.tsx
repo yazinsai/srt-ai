@@ -1,3 +1,5 @@
+'use client';
+
 import React, { FormEvent, useState } from "react";
 import Image from "next/image";
 
@@ -9,15 +11,22 @@ function classNames(...classes: any[]) {
 }
 
 const LANGUAGES = [
-  "Arabic",
-  "English",
-  "French",
-  "German",
-  "Persian", 
-  "Malay",
-  "Spanish",
-  "Turkish",
-];
+  'Mandarin Chinese', 'Spanish', 'English', 'Hindi', 'Bengali', 'Portuguese', 'Russian',
+  'Japanese', 'Punjabi', 'Marathi', 'Telugu', 'Wu Chinese', 'Turkish', 'Korean',
+  'French', 'German', 'Vietnamese', 'Tamil', 'Yue Chinese', 'Urdu', 'Javanese', 'Italian',
+  'Arabic', 'Gujarati', 'Persian', 'Bhojpuri', 'Min Nan', 'Hakka',
+  'Jin Chinese', 'Hausa', 'Kannada', 'Indonesian', 'Polish', 'Yoruba', 'Xiang Chinese',
+  'Malayalam', 'Odia', 'Maithili', 'Burmese', 'Sunda', 'Ukrainian',
+  'Igbo', 'Uzbek', 'Sindhi', 'Romanian', 'Tagalog', 'Dutch',
+  'Danish', 'Finnish', 'Norwegian', 'Swedish',
+  'Amharic', 'Pashto', 'Magahi', 'Thai', 'Saraiki', 'Khmer',
+  'Somali', 'Malay', 'Cebuano', 'Nepali', 'Assamese', 'Sinhalese',
+  'Kurdish', 'Fulfulde', 'Greek', 'Chittagonian', 'Kazakh', 'Hungarian',
+  'Kinyarwanda', 'Zulu', 'Czech', 'Uyghur', 'Hmong', 'Shona',
+  'Quechua', 'Belarusian', 'Balochi', 'Konkani', 'Armenian', 'Azerbaijani',
+  'Bashkir', 'Luxembourgish', 'Tibetan', 'Tigrinya', 'Turkmen', 'Kashmiri',
+  'Malagasy', 'Kirghiz', 'Tatar', 'Tonga', 'Tswana', 'Esperanto'
+].sort()
 
 const readFileContents = async (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -71,7 +80,7 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full px-4 mt-6 md:px-0"
+      className="flex flex-col px-4 mt-6 w-full md:px-0"
     >
       <label
         htmlFor="srt-file"
@@ -87,9 +96,8 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`w-full border-2 ${
-          dragging ? "border-blue-300" : "border-transparent"
-        } md:rounded-lg bg-[#EFEFEF] px-12 relative`}
+        className={`w-full border-2 ${dragging ? "border-blue-300" : "border-transparent"
+          } md:rounded-lg bg-[#EFEFEF] px-12 relative`}
       >
         <input
           type="file"
@@ -104,7 +112,7 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
           )}
         >
           {!file && (
-            <div className="relative hidden mx-auto -bottom-8 md:block">
+            <div className="hidden relative -bottom-8 mx-auto md:block">
               <Image
                 src="/fire-chicken.png"
                 alt="Chicken on fire"
@@ -151,7 +159,7 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
                 id="language"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="px-4 py-2 mt-4 ml-2 bg-white border border-gray-300 rounded-lg md:mt-0"
+                className="px-4 py-2 mt-4 ml-2 bg-white rounded-lg border border-gray-300 md:mt-0"
               >
                 <option value="">Choose language&hellip;</option>
                 {LANGUAGES.map((lang, i) => (
