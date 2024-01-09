@@ -50,7 +50,7 @@ export default function Home() {
       doneReading = done;
       const chunk = decoder.decode(value);
 
-      content += chunk;
+      content += chunk + "\n\n";
       setTranslatedSrt((prev) => prev + chunk);
       if (chunk.trim().length)
         setTranslatedChunks((prev) => [...prev, parseChunk(chunk)]);
