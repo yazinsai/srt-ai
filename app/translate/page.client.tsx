@@ -37,7 +37,7 @@ export default function ({ content, language }: { content: string, language: str
   const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
 
   // TODO: When the job is done, cache it in KV so we don't have to pay on page refresh
-  async function submit(content: string, language: string) {
+  async function submit() {
     try {
       setStatus("busy");
       const response = await fetch("/api", {
@@ -70,7 +70,7 @@ export default function ({ content, language }: { content: string, language: str
   }
 
   React.useEffect(() => {
-    submit(content, language);
+    submit();
   }, [])
 
   async function handleStream(response: any) {
