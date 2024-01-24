@@ -23,7 +23,7 @@ const triggerFileDownload = (filename: string, content: string) => {
 
 function Translating({ chunks }: { chunks: Chunk[] }) {
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex gap-y-2 flex-col-reverse">
       {chunks.map((chunk, id) => (
         <Timestamp key={id} {...chunk} />
       ))}
