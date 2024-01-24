@@ -1,4 +1,5 @@
-import { groupSegmentsByTokenLength, parseSegment, parseStreamedResponse } from "@/lib/srt";
+import { groupSegmentsByTokenLength, parseStreamedResponse } from "@/lib/srt";
+import { parseSegment } from "@/lib/client";
 
 export const dynamic = 'force-dynamic' // defaults to auto
 

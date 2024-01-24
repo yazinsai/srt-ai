@@ -7,6 +7,8 @@ import Form from "@/components/Form";
 import Timestamp from "@/components/Timestamp";
 
 import type { Chunk } from "@/types";
+import PaymentButton from "@/components/PaymentButton";
+import { parseSegment } from "@/lib/client";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -32,69 +34,44 @@ function Translating({ chunks }: { chunks: Chunk[] }) {
 }
 
 export default function Home() {
-  const [status, setStatus] = React.useState<"idle" | "busy" | "done">("idle");
-  const [translatedSrt, setTranslatedSrt] = React.useState("");
-  const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
+  const [status, setStatus] = React.useState<"idle" | "pending">("idle");
+  const [seconds, setSeconds] = React.useState(0);
+  // const [translatedSrt, setTranslatedSrt] = React.useState("");
+  // const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
 
-  async function handleStream(response: any) {
-    const data = response.body;
-    if (!data) return;
+  // async function handleStream(response: any) {
+  //   const data = response.body;
+  //   if (!data) return;
 
-    let content = "";
-    let doneReading = false;
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
+  //   let content = "";
+  //   let doneReading = false;
+  //   const reader = data.getReader();
+  //   const decoder = new TextDecoder();
 
-    while (!doneReading) {
-      const { value, done } = await reader.read();
-      doneReading = done;
-      const chunk = decoder.decode(value);
+  //   while (!doneReading) {
+  //     const { value, done } = await reader.read();
+  //     doneReading = done;
+  //     const chunk = decoder.decode(value);
 
-      content += chunk + "\n\n";
-      setTranslatedSrt((prev) => prev + chunk);
-      if (chunk.trim().length)
-        setTranslatedChunks((prev) => [...prev, parseChunk(chunk)]);
-    }
+  //     content += chunk + "\n\n";
+  //     setTranslatedSrt((prev) => prev + chunk);
+  //     if (chunk.trim().length)
+  //       setTranslatedChunks((prev) => [...prev, parseChunk(chunk)]);
+  //   }
 
-    return content;
+  //   return content;
 
-    function parseChunk(chunkStr: string): Chunk {
-      const [index, timestamps, text] = chunkStr.split("\n");
-      const [start, end] = timestamps.split(" --> ");
-      return { index, start, end, text };
-    }
-  }
+  //   function parseChunk(chunkStr: string): Chunk {
+  //     const [index, timestamps, text] = chunkStr.split("\n");
+  //     const [start, end] = timestamps.split(" --> ");
+  //     return { index, start, end, text };
+  //   }
+  // }
 
   async function handleSubmit(content: string, language: string) {
-    try {
-      setStatus("busy");
-      const response = await fetch("/api", {
-        method: "POST",
-        body: JSON.stringify({ content, language }),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.ok) {
-        const content = await handleStream(response);
-        const filename = `${language}.srt`;
-        if (content) {
-          setStatus("done");
-          triggerFileDownload(filename, content);
-        } else {
-          alert("Error occurred while reading the file");
-        }
-      } else {
-        console.error(
-          "Error occurred while submitting the translation request"
-        );
-      }
-    } catch (error) {
-      setStatus("idle");
-      console.error(
-        "Error during file reading and translation request:",
-        error
-      );
-    }
+    const seconds = timestampToSeconds(findLastTimestampFromSRT(content));
+    setSeconds(seconds);
+    setStatus("pending");
   }
 
   return (
@@ -117,7 +94,12 @@ export default function Home() {
           <Form onSubmit={handleSubmit} />
         </>
       )}
-      {status == "busy" && (
+      {status == "pending" && (
+        <div>
+          <PaymentButton seconds={seconds} />
+        </div>
+      )}
+      {/* {status == "busy" && (
         <>
           <h1
             className={classNames(
@@ -152,7 +134,33 @@ export default function Home() {
             </a>
           </p>
         </>
-      )}
+      )} */}
     </main>
+  );
+}
+
+function findLastTimestampFromSRT(content: string) {
+  const segments = content.split(/\r\n\r\n|\n\n/); // \r\n for Windows, \n for Unix
+
+  // Find the last timestamp with a valid id
+  for (let i = segments.length - 1; i > 0; i--) {
+    if (!segments[i] || segments[i].trim().length === 0) continue; // skip empty lines (e.g. at the end of the file
+
+    const { id, timestamp } = parseSegment(segments[i]);
+    if (isNaN(id)) continue;
+
+    const [start, end] = timestamp.split(" --> ");
+    return end.trim();
+  }
+
+  throw new Error("No valid timestamp found");
+}
+
+function timestampToSeconds(timestamp: string) {
+  // convert hh:mm:ss,mmm to seconds
+  const [hh, mm, ss] = timestamp.split(":");
+  const [ss2, mmm] = ss.split(",");
+  return (
+    parseInt(hh) * 3600 + parseInt(mm) * 60 + parseInt(ss2) + parseInt(mmm) / 1000
   );
 }
