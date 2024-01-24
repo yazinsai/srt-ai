@@ -11,7 +11,8 @@ interface URLSearchParams {
 
 export default async function Page({ searchParams }: { searchParams: URLSearchParams }) {
   // Retrieve the Stripe session
-  const value = await kv.get<any>(searchParams.id)
+  const id = searchParams.id
+  const value = await kv.get<any>(id)
   if (!value) {
     return (
       <div>
@@ -33,7 +34,7 @@ export default async function Page({ searchParams }: { searchParams: URLSearchPa
 
   return (
     <div>
-      <ClientPage content={content} language={language} />
+      <ClientPage id={id} />
     </div>
   )
 }

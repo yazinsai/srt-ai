@@ -1,5 +1,7 @@
 import { groupSegmentsByTokenLength, parseStreamedResponse } from "@/lib/srt";
 import { parseSegment } from "@/lib/client";
+import { kv } from '@vercel/kv';
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
@@ -53,7 +55,12 @@ const retrieveTranslation = async (
 
 export async function POST(request: Request) {
   try {
-    const { content, language } = await request.json()
+    const { id } = await request.json();
+    if (!id) return new Response(JSON.stringify({ error: "'id' required" }), { status: 400 });
+
+    const { sessionId, content, language } = await kv.get<any>(id)
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
     const segments = content.split(/\r\n\r\n|\n\n/).map(parseSegment);
     const groups = groupSegmentsByTokenLength(segments, MAX_TOKENS_IN_SEGMENT);
 

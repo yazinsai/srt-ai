@@ -31,7 +31,7 @@ function Translating({ chunks }: { chunks: Chunk[] }) {
   );
 }
 
-export default function ({ content, language }: { content: string, language: string }) {
+export default function ({ id }: { id: string }) {
   const [status, setStatus] = React.useState<"idle" | "busy" | "done">("idle");
   const [translatedSrt, setTranslatedSrt] = React.useState("");
   const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
@@ -42,13 +42,13 @@ export default function ({ content, language }: { content: string, language: str
       setStatus("busy");
       const response = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify({ content, language }),
+        body: JSON.stringify({ id }),
         headers: { "Content-Type": "application/json" },
       });
 
       if (response.ok) {
         const content = await handleStream(response);
-        const filename = `${language}.srt`;
+        const filename = `${id}.srt`;
         if (content) {
           setStatus("done");
           triggerFileDownload(filename, content);
