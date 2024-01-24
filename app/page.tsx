@@ -36,6 +36,9 @@ function Translating({ chunks }: { chunks: Chunk[] }) {
 export default function Home() {
   const [status, setStatus] = React.useState<"idle" | "pending">("idle");
   const [seconds, setSeconds] = React.useState(0);
+  const [content, setContent] = React.useState("");
+  const [language, setLanguage] = React.useState("");
+
   // const [translatedSrt, setTranslatedSrt] = React.useState("");
   // const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
 
@@ -71,6 +74,8 @@ export default function Home() {
   async function handleSubmit(content: string, language: string) {
     const seconds = timestampToSeconds(findLastTimestampFromSRT(content));
     setSeconds(seconds);
+    setContent(content);
+    setLanguage(language);
     setStatus("pending");
   }
 
@@ -96,7 +101,10 @@ export default function Home() {
       )}
       {status == "pending" && (
         <div>
-          <PaymentButton seconds={seconds} />
+          <PaymentButton seconds={seconds}>
+            <input type="hidden" name="content" value={content} />
+            <input type="hidden" name="language" value={language} />
+          </PaymentButton>
         </div>
       )}
       {/* {status == "busy" && (
