@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'hero-pattern': 'radial-gradient(50% 50% at 50% 50%, rgba(47, 234, 81, 0.15) 0%, rgba(47, 234, 81, 0.00) 80.21%)'
+      }
     },
   },
   plugins: [],

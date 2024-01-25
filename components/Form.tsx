@@ -80,14 +80,16 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col px-4 mt-6 w-full md:px-0"
+      className="flex flex-col px-4 mt-6 w-full md:px-0 relative"
     >
-      <label
-        htmlFor="srt-file"
-        className="block font-bold py-4 md:pl-8 text-lg text-[#444444]"
-      >
-        {file ? "✅" : "👉"} Step 1: Choose your SRT file
-      </label>
+      {file && (
+        <div className="flex flex-row gap-x-3">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-green-500">
+            <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
+          </svg>
+          <div>Select an SRT file</div>
+        </div>
+      )}
       <div
         id="srt-file"
         onDragOver={(e) => {
@@ -96,8 +98,8 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`w-full border-2 ${dragging ? "border-blue-300" : "border-transparent"
-          } md:rounded-lg bg-[#EFEFEF] px-12 relative`}
+        className={`w-full ${file ? "" : "border-4"} ${dragging ? "border-green-300" : "border-green-500 border-dashed"
+          } md:rounded-lg relative`}
       >
         <input
           type="file"
@@ -105,39 +107,21 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
           onChange={(e) => setFile(e.target.files![0])}
           className="absolute inset-0 opacity-0 cursor-pointer"
         />
-        <div
-          className={classNames(
-            "grid items-center",
-            file ? "md:py-4" : "md:grid-cols-2"
-          )}
-        >
-          {!file && (
-            <div className="hidden relative -bottom-8 mx-auto md:block">
-              <Image
-                src="/fire-chicken.png"
-                alt="Chicken on fire"
-                width={256}
-                height={400}
-                priority
-              />
-            </div>
-          )}
-          <div>
-            <div className="text-center py-4 md:py-0 text-[#444444]">
-              {file ? (
-                `📂 ${file.name}`
-              ) : (
-                <>
-                  <div className="hidden md:block">
-                    <div>Drop it like it&lsquo;s hot</div>
-                    <div className="my-3 text-sm">- or -</div>
-                  </div>
-                  <div className="rounded-sm bg-[#d9d9d9] py-2 px-2">
-                    Browse for SRT file&hellip;
-                  </div>
-                </>
-              )}
-            </div>
+        <div>
+          <div className="py-4 md:py-0">
+            {file ? (
+              <div className="py-4 pl-8 text-neutral-600 font-normal">📂 {file.name}</div>
+            ) : (
+              <div className="py-4 md:py-24 text-center text-neutral-600">
+                <div className="hidden md:block">
+                  <div>Drop any SRT file</div>
+                  <div className="my-3 text-sm">- or -</div>
+                </div>
+                <div className="rounded-sm bg-green-500 text-neutral-50 py-2 px-2 max-w-[200px] mx-auto">
+                  Browse
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

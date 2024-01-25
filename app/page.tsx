@@ -1,7 +1,6 @@
 'use client';
 
 import React from "react";
-import { libre, roaldDahl } from "@/fonts";
 
 import Form from "@/components/Form";
 import Timestamp from "@/components/Timestamp";
@@ -39,38 +38,6 @@ export default function Home() {
   const [content, setContent] = React.useState("");
   const [language, setLanguage] = React.useState("");
 
-  // const [translatedSrt, setTranslatedSrt] = React.useState("");
-  // const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
-
-  // async function handleStream(response: any) {
-  //   const data = response.body;
-  //   if (!data) return;
-
-  //   let content = "";
-  //   let doneReading = false;
-  //   const reader = data.getReader();
-  //   const decoder = new TextDecoder();
-
-  //   while (!doneReading) {
-  //     const { value, done } = await reader.read();
-  //     doneReading = done;
-  //     const chunk = decoder.decode(value);
-
-  //     content += chunk + "\n\n";
-  //     setTranslatedSrt((prev) => prev + chunk);
-  //     if (chunk.trim().length)
-  //       setTranslatedChunks((prev) => [...prev, parseChunk(chunk)]);
-  //   }
-
-  //   return content;
-
-  //   function parseChunk(chunkStr: string): Chunk {
-  //     const [index, timestamps, text] = chunkStr.split("\n");
-  //     const [start, end] = timestamps.split(" --> ");
-  //     return { index, start, end, text };
-  //   }
-  // }
-
   async function handleSubmit(content: string, language: string) {
     const seconds = timestampToSeconds(findLastTimestampFromSRT(content));
     setSeconds(seconds);
@@ -82,19 +49,18 @@ export default function Home() {
   return (
     <main
       className={classNames(
-        "max-w-2xl flex flex-col items-center mx-auto",
-        libre.className
-      )}
+        "max-w-2xl flex flex-col items-center mx-auto relative")}
     >
+      <div className="aspect-square w-[50vw] rounded-full bg-hero-pattern absolute -top-1/2 -translate-y-[50px] left-1/2 -translate-x-1/2 pointer-events-none">hi there
+      </div>
       {status == "idle" && (
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
+              "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-green-400 to-green-600 bg-clip-text text-transparent"
             )}
           >
-            Translate any SRT, to any language
+            Translate any SRT, <br />to any language
           </h1>
           <Form onSubmit={handleSubmit} />
         </>
@@ -107,42 +73,6 @@ export default function Home() {
           </PaymentButton>
         </div>
       )}
-      {/* {status == "busy" && (
-        <>
-          <h1
-            className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
-            )}
-          >
-            Translating&hellip;
-          </h1>
-          <p>(The file will automatically download when it's done)</p>
-          <Translating chunks={translatedChunks} />
-        </>
-      )}
-      {status == "done" && (
-        <>
-          <h1
-            className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
-            )}
-          >
-            All done!
-          </h1>
-          <p>Check your "Downloads" folder 🍿</p>
-          <p className="mt-4 text-[#444444]">
-            Psst. Need to edit your SRT? Try{" "}
-            <a
-              href="https://www.veed.io/subtitle-tools/edit?locale=en&source=/tools/subtitle-editor/srt-editor"
-              target="_blank"
-            >
-              this tool
-            </a>
-          </p>
-        </>
-      )} */}
     </main>
   );
 }

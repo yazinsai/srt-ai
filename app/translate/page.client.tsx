@@ -1,7 +1,6 @@
 'use client';
 
 import React from "react";
-import { libre, roaldDahl } from "@/fonts";
 
 import Form from "@/components/Form";
 import Timestamp from "@/components/Timestamp";
@@ -105,16 +104,14 @@ export default function ({ id }: { id: string }) {
   return (
     <main
       className={classNames(
-        "max-w-2xl flex flex-col items-center mx-auto",
-        libre.className
+        "max-w-2xl flex flex-col items-center mx-auto"
       )}
     >
       {status == "busy" && (
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
+              "px-4 text-3xl md:text-5xl text-center font-bold my-6"
             )}
           >
             Translating&hellip;
@@ -127,8 +124,7 @@ export default function ({ id }: { id: string }) {
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
+              "px-4 text-3xl md:text-5xl text-center font-bold my-6"
             )}
           >
             All done!
