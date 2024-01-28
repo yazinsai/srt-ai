@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
   const headersList = headers();
   const origin = headersList.get('origin')
 
+  // TODO: Calculate seconds, instead of reading it (vulnerable to manipulation)
   const formData = await request.formData();
   const seconds = Number(formData.get('seconds'));
   const content = formData.get('content');
