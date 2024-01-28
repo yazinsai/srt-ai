@@ -1,13 +1,7 @@
 'use client';
 
 import React from "react";
-
 import Form from "@/components/Form";
-import Timestamp from "@/components/Timestamp";
-
-import type { Chunk } from "@/types";
-import PaymentButton from "@/components/PaymentButton";
-import { parseSegment } from "@/lib/client";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");

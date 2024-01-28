@@ -31,9 +31,27 @@ function Translating({ chunks }: { chunks: Chunk[] }) {
 }
 
 export default function ({ id }: { id: string }) {
-  const [status, setStatus] = React.useState<"idle" | "busy" | "done">("idle");
+  const [status, setStatus] = React.useState<"idle" | "busy" | "done">("busy");
   const [translatedSrt, setTranslatedSrt] = React.useState("");
   const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
+
+  // Original content
+  const [content, setContent] = React.useState<string>("");
+  const [maxSegments, setMaxSegments] = React.useState<number>(0);
+
+  async function fetchContent() {
+    try {
+      const response = await fetch(`/api/content`, { method: "POST", body: JSON.stringify({ id }) });
+      const content = await response.text()
+      setContent(content);
+      setMaxSegments(content.split(/\r\n\r\n|\n\n/).length);
+    } catch (error) {
+      console.error(
+        "Error during file reading and translation request:",
+        error
+      );
+    }
+  }
 
   // TODO: When the job is done, cache it in KV so we don't have to pay on page refresh
   async function submit() {
@@ -70,6 +88,7 @@ export default function ({ id }: { id: string }) {
 
   React.useEffect(() => {
     submit();
+    fetchContent();
   }, [])
 
   async function handleStream(response: any) {
@@ -111,12 +130,13 @@ export default function ({ id }: { id: string }) {
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6"
+              "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
             )}
           >
             Translating&hellip;
           </h1>
-          <p>(The file will automatically download when it's done)</p>
+          <p className="text-neutral-500">(The file will automatically download when it's done)</p>
+          <progress id="file" max={maxSegments} aria-busy={maxSegments === 0} value={translatedChunks.length}>{formatPercent(translatedChunks.length / maxSegments)}</progress>
           <Translating chunks={translatedChunks} />
         </>
       )}
@@ -124,23 +144,18 @@ export default function ({ id }: { id: string }) {
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6"
+              "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
             )}
           >
-            All done!
+            Done!
           </h1>
-          <p>Check your "Downloads" folder 🍿</p>
-          <p className="mt-4 text-[#444444]">
-            Psst. Need to edit your SRT? Try{" "}
-            <a
-              href="https://www.veed.io/subtitle-tools/edit?locale=en&source=/tools/subtitle-editor/srt-editor"
-              target="_blank"
-            >
-              this tool
-            </a>
-          </p>
+          <p>(Check your "Downloads" folder 🍿)</p>
         </>
       )}
     </main>
   );
+}
+
+function formatPercent(value: number) {
+  return `${Math.round(value * 100)}%`;
 }
