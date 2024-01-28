@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <main
       className={classNames(
-        "max-w-2xl flex flex-col items-center mx-auto relative")}
+        "max-w-xl flex flex-col items-center mx-auto relative")}
     >
       <div className="aspect-square w-[50vw] rounded-full bg-hero-pattern absolute -top-1/2 -translate-y-[50px] left-1/2 -translate-x-1/2 pointer-events-none"></div>
       {status == "idle" && (
@@ -61,6 +61,7 @@ export default function Home() {
           >
             Translate any SRT, <br />to any language
           </h1>
+
           <Form onSubmit={handleSubmit} />
         </>
       )}
