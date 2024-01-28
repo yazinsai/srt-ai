@@ -51,13 +51,12 @@ export default function Home() {
       className={classNames(
         "max-w-2xl flex flex-col items-center mx-auto relative")}
     >
-      <div className="aspect-square w-[50vw] rounded-full bg-hero-pattern absolute -top-1/2 -translate-y-[50px] left-1/2 -translate-x-1/2 pointer-events-none">hi there
-      </div>
+      <div className="aspect-square w-[50vw] rounded-full bg-hero-pattern absolute -top-1/2 -translate-y-[50px] left-1/2 -translate-x-1/2 pointer-events-none"></div>
       {status == "idle" && (
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-green-400 to-green-600 bg-clip-text text-transparent"
+              "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
             )}
           >
             Translate any SRT, <br />to any language

@@ -84,10 +84,11 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
     >
       {file && (
         <div className="flex flex-row gap-x-3">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-green-500">
-            <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="12" fill="#F0FDF4" />
+            <path d="M6 11.6L10.2 15.8L18 8" stroke="#22C55E" strokeWidth="2" />
           </svg>
-          <div>Select an SRT file</div>
+          <div className="text-neutral-600">Select an SRT file</div>
         </div>
       )}
       <div
@@ -110,7 +111,7 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         <div>
           <div className="py-4 md:py-0">
             {file ? (
-              <div className="py-4 pl-8 text-neutral-600 font-normal">📂 {file.name}</div>
+              <div className="py-0 md:py-4 pl-[2.2rem] text-neutral-500 font-normal">📁 {file.name}</div>
             ) : (
               <div className="py-4 md:py-24 text-center text-neutral-600">
                 <div className="hidden md:block">
@@ -126,38 +127,35 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
         </div>
       </div>
 
-      <div className="md:h-6"></div>
+      <div className="h-2 md:h-6"></div>
 
       {file && (
         <>
-          <div>
-            <label
-              htmlFor="srt-file"
-              className="block font-bold md:pl-8 mt-6 md:mt-2 py-4 text-lg text-[#444444]"
-            >
-              {language ? "✅" : "👉"} Step 2: Select a Target language
-            </label>
-            <div className="rounded-lg bg-[#fafafa] text-[#444444] py-4 md:py-8 md:px-8 relative md:flex items-center text-center md:text-left">
-              <div>Translate this SRT file to</div>
-              <select
-                id="language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="px-4 py-2 mt-4 ml-2 bg-white rounded-lg border border-gray-300 md:mt-0"
-              >
-                <option value="">Choose language&hellip;</option>
-                {LANGUAGES.map((lang, i) => (
-                  <option key={i} value={lang}>
-                    {lang}
-                  </option>
-                ))}
-              </select>
+          <div className="flex flex-col gap-y-3 md:flex-row md:gap-x-3">
+            <div className="flex flex-row gap-x-3 items-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="11.5" fill="#FEFCE8" stroke="#FEFCE8" />
+                <path d="M5 11.8H17.6M17.6 11.8L12.8 7M17.6 11.8L12.8 16.6" stroke="#EAB308" strokeWidth="2" />
+              </svg>
+              <div className="text-neutral-600">Choose target language</div>
             </div>
-            <div className="h-2"></div>
+            <select
+              id="language"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="px-2 py-1.5 bg-white rounded-md border border-gray-300 md:mt-0 font-normal"
+            >
+              <option value="">Choose language&hellip;</option>
+              {LANGUAGES.map((lang, i) => (
+                <option key={i} value={lang}>
+                  {lang}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             disabled={!file || !language}
-            className="bg-[#444444] hover:bg-[#3a3a3a] text-white mt-6 font-bold py-2 px-6 rounded-lg disabled:bg-[#eeeeee] disabled:text-[#aaaaaa]"
+            className="bg-green-600 hover:bg-green-500 text-white mt-6 font-bold py-2 px-6 rounded-md disabled:bg-[#eeeeee] disabled:text-[#aaaaaa]"
           >
             Translate {language ? `to ${language}` : `SRT`} &rarr;
           </button>
