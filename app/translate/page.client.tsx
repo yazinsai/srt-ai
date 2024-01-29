@@ -130,13 +130,13 @@ export default function ({ id }: { id: string }) {
         <>
           <h1
             className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
+              "px-4 text-3xl md:text-5xl text-center font-black pt-6 pb-2 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
             )}
           >
             Translating&hellip;
           </h1>
           <p className="text-neutral-500">(The file will automatically download when it's done)</p>
-          <progress id="file" max={maxSegments} aria-busy={maxSegments === 0} value={translatedChunks.length}>{formatPercent(translatedChunks.length / maxSegments)}</progress>
+          <ProgressBar value={translatedChunks.length} max={maxSegments} />
           <Translating chunks={translatedChunks} />
         </>
       )}
@@ -158,4 +158,15 @@ export default function ({ id }: { id: string }) {
 
 function formatPercent(value: number) {
   return `${Math.round(value * 100)}%`;
+}
+
+function ProgressBar({ value, max }: { value: number; max: number }) {
+  return (
+    <div className="my-12 w-full rounded-full bg-neutral-50 h-12 p-2">
+      <div
+        style={{ width: formatPercent(value / max) }}
+        className="bg-gradient-to-r from-[#1B9639] to-[#3DDC63] rounded-full h-full"
+      ></div>
+    </div>
+  );
 }

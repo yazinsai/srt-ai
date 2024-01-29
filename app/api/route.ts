@@ -25,7 +25,7 @@ const retrieveTranslation = async (
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo-1106",
       max_tokens: 2048,
       frequency_penalty: 0,
       presence_penalty: 0,
