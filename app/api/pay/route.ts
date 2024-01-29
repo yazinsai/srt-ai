@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const seconds = Number(formData.get('seconds'));
   const content = formData.get('content');
   const language = formData.get('language');
-  const quantity = Math.max(1, Math.floor(seconds / 600));
+  const quantity = Math.ceil(seconds / 3600); // $1/hr, min $1
 
   // Generate a 16 character random alphanumeric ID for the KV key
   const kvId = Math.random().toString(36).slice(2, 18);
@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'SRT translation (up to 10 mins)'
+              name: 'SRT translation (1 hour)'
             },
-            unit_amount: 100, // $1 per 10 mins
+            unit_amount: 100, // $1/hour
           },
           quantity,
         },

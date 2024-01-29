@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={classNames(" border-t-4 border-green-500 pt-4", merriweather.className)}>{children}</body>
+      <body className={classNames("border-t-4 border-green-500 -pt-1", merriweather.className)}>{children}</body>
     </html>
   )
 }
