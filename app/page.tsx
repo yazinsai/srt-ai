@@ -1,158 +1,69 @@
 'use client';
 
 import React from "react";
-import { libre, roaldDahl } from "@/fonts";
-
 import Form from "@/components/Form";
-import Timestamp from "@/components/Timestamp";
-
-import type { Chunk } from "@/types";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const triggerFileDownload = (filename: string, content: string) => {
-  const element = document.createElement("a");
-  const file = new Blob([content], { type: "text/plain" });
-  element.href = URL.createObjectURL(file);
-  element.download = filename;
-  document.body.appendChild(element);
-  element.click();
-};
-
-function Translating({ chunks }: { chunks: Chunk[] }) {
-  return (
-    <div className="flex flex-col gap-y-2">
-      {chunks.map((chunk, id) => (
-        <Timestamp key={id} {...chunk} />
-      ))}
-    </div>
-  );
-}
-
 export default function Home() {
-  const [status, setStatus] = React.useState<"idle" | "busy" | "done">("idle");
-  const [translatedSrt, setTranslatedSrt] = React.useState("");
-  const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
-
-  async function handleStream(response: any) {
-    const data = response.body;
-    if (!data) return;
-
-    let content = "";
-    let doneReading = false;
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-
-    while (!doneReading) {
-      const { value, done } = await reader.read();
-      doneReading = done;
-      const chunk = decoder.decode(value);
-
-      content += chunk + "\n\n";
-      setTranslatedSrt((prev) => prev + chunk);
-      if (chunk.trim().length)
-        setTranslatedChunks((prev) => [...prev, parseChunk(chunk)]);
-    }
-
-    return content;
-
-    function parseChunk(chunkStr: string): Chunk {
-      const [index, timestamps, text] = chunkStr.split("\n");
-      const [start, end] = timestamps.split(" --> ");
-      return { index, start, end, text };
-    }
-  }
-
-  async function handleSubmit(content: string, language: string) {
-    try {
-      setStatus("busy");
-      const response = await fetch("/api", {
-        method: "POST",
-        body: JSON.stringify({ content, language }),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.ok) {
-        const content = await handleStream(response);
-        const filename = `${language}.srt`;
-        if (content) {
-          setStatus("done");
-          triggerFileDownload(filename, content);
-        } else {
-          alert("Error occurred while reading the file");
-        }
-      } else {
-        console.error(
-          "Error occurred while submitting the translation request"
-        );
-      }
-    } catch (error) {
-      setStatus("idle");
-      console.error(
-        "Error during file reading and translation request:",
-        error
-      );
-    }
-  }
-
   return (
     <main
       className={classNames(
-        "max-w-2xl flex flex-col items-center mx-auto",
-        libre.className
-      )}
+        "max-w-4xl flex flex-col items-center mx-auto relative")}
     >
-      {status == "idle" && (
-        <>
-          <h1
-            className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
-            )}
-          >
-            Translate any SRT, to any language
-          </h1>
-          <Form onSubmit={handleSubmit} />
-        </>
-      )}
-      {status == "busy" && (
-        <>
-          <h1
-            className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
-            )}
-          >
-            Translating&hellip;
-          </h1>
-          <p>(The file will automatically download when it's done)</p>
-          <Translating chunks={translatedChunks} />
-        </>
-      )}
-      {status == "done" && (
-        <>
-          <h1
-            className={classNames(
-              "px-4 text-3xl md:text-5xl text-center font-bold my-6",
-              roaldDahl.className
-            )}
-          >
-            All done!
-          </h1>
-          <p>Check your "Downloads" folder 🍿</p>
-          <p className="mt-4 text-[#444444]">
-            Psst. Need to edit your SRT? Try{" "}
-            <a
-              href="https://www.veed.io/subtitle-tools/edit?locale=en&source=/tools/subtitle-editor/srt-editor"
-              target="_blank"
-            >
-              this tool
-            </a>
-          </p>
-        </>
-      )}
+      <div className="aspect-square w-[50vw] rounded-full bg-hero-pattern absolute -top-1/2 -translate-y-[50px] left-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+      <h1
+        className={classNames(
+          "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
+        )}
+      >
+        Translate any SRT, <br />to any language
+      </h1>
+
+      <Form />
+
+      <div className="py-36">
+        <FeatureSections />
+      </div>
     </main>
   );
+}
+
+function FeatureSections() {
+  return (
+    <div className="flex flex-col gap-y-16">
+      <div className="flex flex-row gap-x-12 items-center">
+        <div className="flex-1">
+          <img src="/book-open.png" className="w-full" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-4xl font-bold text-neutral-800">From any language, to any language.</h2>
+          <p className="mt-6 text-neutral-600 leading-relaxed">While most tools can only translate from English, SRT-ai allows you to translate from & to over 100+ languages, including Swahili.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-row md:flex-row-reverse gap-x-12 items-center">
+        <div className="flex-1">
+          <img src="/better-ga.png" className="w-full p-6" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-4xl font-bold text-neutral-800">Infinitely better than Google Translate.</h2>
+          <p className="mt-6 text-neutral-600 leading-relaxed">We don’t translate individual segments. Instead, the entire dialogue is translated, maintaining important contextual cues to achieve better results. This is achieved using the latest GPT-4 model,  achieving better-than-human-level accuracy, instantly.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-row gap-x-12 items-center">
+        <div className="flex-1">
+          <img src="/pricing.png" className="w-full p-6" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-4xl font-bold text-neutral-800">Unbeatable price: just $1/hr</h2>
+          <p className="mt-6 text-neutral-600 leading-relaxed">Most tools charge several $'s per minute, and then a little extra for tracking the timestamps. Our pricing is simple: just $1/hour.</p>
+        </div>
+      </div>
+    </div>
+  )
 }

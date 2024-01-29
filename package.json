@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/kv": "^1.0.1",
     "eventsource-parser": "^1.1.1",
     "humanloop": "^0.5.36",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
+    "stripe": "^14.13.0",
     "tiktoken": "^1.0.11"
   },
   "devDependencies": {
