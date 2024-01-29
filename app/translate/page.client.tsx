@@ -111,10 +111,10 @@ export default function ({ id }: { id: string }) {
   }
 
   return (
-    <main className="h-screen flex flex-col inset-0 w-full">
+    <main className="h-screen flex flex-col inset-0 w-full p-4 md:p-0">
       {status == "busy" && (
         <>
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto text-center">
             <h1
               className={classNames(
                 "px-4 text-3xl md:text-5xl text-center font-black pt-6 pb-2 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
@@ -139,7 +139,7 @@ export default function ({ id }: { id: string }) {
       )}
 
       {status == "done" && (
-        <div className=" max-w-2xl mx-auto">
+        <div className=" max-w-2xl mx-auto text-center">
           <h1
             className={classNames(
               "px-4 text-3xl md:text-5xl text-center font-black py-6 bg-gradient-to-b from-[#1B9639] to-[#3DDC63] bg-clip-text text-transparent"
