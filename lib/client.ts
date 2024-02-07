@@ -5,6 +5,11 @@ export function parseSegment(text: string): Segment {
   return {
     id: parseInt(id),
     timestamp,
-    text: lines.join("\n"),
+    text: lines.join(" "),
   };
+}
+
+export function parseTimestamp(timestamps: string) {
+  const [start, end] = timestamps.split(" --> ");
+  return { start, end }
 }
