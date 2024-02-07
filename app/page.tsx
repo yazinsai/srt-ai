@@ -7,6 +7,7 @@ import Form from "@/components/Form";
 import Timestamp from "@/components/Timestamp";
 
 import type { Chunk } from "@/types";
+import { parseSegment, parseTimestamp } from "@/lib/client";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -59,9 +60,9 @@ export default function Home() {
     return content;
 
     function parseChunk(chunkStr: string): Chunk {
-      const [index, timestamps, text] = chunkStr.split("\n");
-      const [start, end] = timestamps.split(" --> ");
-      return { index, start, end, text };
+      const { id, timestamp, text } = parseSegment(chunkStr);
+      const { start, end } = parseTimestamp(timestamp);
+      return { index: id.toString(), start, end, text };
     }
   }
 

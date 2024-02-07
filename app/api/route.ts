@@ -1,4 +1,5 @@
-import { groupSegmentsByTokenLength, parseSegment, parseStreamedResponse } from "@/lib/srt";
+import { groupSegmentsByTokenLength, parseStreamedResponse } from "@/lib/srt";
+import { parseSegment } from "@/lib/client";
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
@@ -22,7 +23,7 @@ const retrieveTranslation = async (
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-0125-preview",
       max_tokens: 2048,
       frequency_penalty: 0,
       presence_penalty: 0,
