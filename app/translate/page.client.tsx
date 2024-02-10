@@ -25,6 +25,8 @@ export default function ({ id }: { id: string }) {
   const [status, setStatus] = React.useState<"idle" | "busy" | "done">("busy");
   const [translatedSrt, setTranslatedSrt] = React.useState("");
   const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const [isUserScrolling, setIsUserScrolling] = React.useState(false);
 
   // Original content
   const [originalSegments, setOriginalSegments] = React.useState<Segment[]>([]);
@@ -81,6 +83,31 @@ export default function ({ id }: { id: string }) {
     fetchContent();
   }, [])
 
+  const handleUserScroll = () => {
+    if (scrollContainerRef.current) {
+      const isAtBottom = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.scrollTop === scrollContainerRef.current.clientHeight;
+      setIsUserScrolling(!isAtBottom);
+    }
+  };
+
+  React.useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleUserScroll);
+    }
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleUserScroll);
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (!isUserScrolling && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [translatedChunks, isUserScrolling])
+
   async function handleStream(response: any) {
     const data = response.body;
     if (!data) return;
@@ -127,7 +154,7 @@ export default function ({ id }: { id: string }) {
             <ProgressBar value={translatedChunks.length} max={originalSegments.length} />
           </div>
           <div className="flex-1 bg-neutral-50 py-8 h-full w-full">
-            <div className="mx-auto max-w-6xl w-full overflow-y-scroll h-full flex flex-col-reverse gap-y-2 items-start text-neutral-600">
+            <div ref={scrollContainerRef} className="mx-auto max-w-6xl w-full overflow-y-scroll h-full flex flex-col gap-y-2 items-start text-neutral-600">
               {translatedChunks.map((chunk, i) => (
                 <div className={classNames("flex flex-row w-full gap-x-3", i % 2 == 0 ? `bg-neutral-50` : 'bg-white')}>
                   <div className="flex-1 text-right">{originalSegments[i].text}</div>
