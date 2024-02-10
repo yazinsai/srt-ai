@@ -25,7 +25,7 @@ const retrieveTranslation = async (
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-4-0125-preview",
+      model: "gpt-3.5-turbo-0125",
       max_tokens: 2048,
       frequency_penalty: 0,
       presence_penalty: 0,
@@ -39,7 +39,7 @@ const retrieveTranslation = async (
         },
         {
           role: "user",
-          content: `Translate this to ${language}. Interleave the "|" segment separator in the response. ALWAYS return the SAME number of segments. Never combine/eliminate a segment.\n\n${text}`,
+          content: `Translate this to ${language}. Interleave the "|" segment separator in the response. ALWAYS return the SAME number of segments. NEVER skip any segment. NEVER combine segments.\n\n${text}`,
         },
       ],
       stream: true,
