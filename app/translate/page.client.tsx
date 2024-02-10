@@ -123,6 +123,7 @@ export default function ({ id }: { id: string }) {
               Translating&hellip;
             </h1>
             <p className="text-neutral-500 mt-2">(The file will automatically download when it's done)</p>
+            <p className="mt-2"><a className="underline text-blue-500" href={`mailto:support@translatesrt.com?subject=Need%20Help%20(Job%3A%20${id})`}>Need help?</a></p>
             <ProgressBar value={translatedChunks.length} max={originalSegments.length} />
           </div>
           <div className="flex-1 bg-neutral-50 py-8 h-full w-full">
