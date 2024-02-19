@@ -5,6 +5,7 @@ import {
   createParser,
 } from "eventsource-parser";
 import { encoding_for_model } from "tiktoken";
+import { SEPARATOR } from "./constants";
 
 /**
  * Groups segments into groups of length `length` or less.
@@ -67,8 +68,8 @@ export function parseStreamedResponse(
           buffer += text;
 
           // If there's a "|" in the buffer, we can enqueue a segment
-          if (buffer.includes("|")) {
-            const segments = buffer.split("|");
+          if (buffer.includes(SEPARATOR)) {
+            const segments = buffer.split(SEPARATOR);
             segments.slice(0, -1).map(segment => controller.enqueue(encoder.encode(segment)));
             buffer = segments[segments.length - 1];
           }
