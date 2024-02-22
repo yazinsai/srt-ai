@@ -1,7 +1,6 @@
 import { groupSegmentsByTokenLength, parseStreamedResponse } from "@/lib/srt";
 import { parseSegment } from "@/lib/client";
 import { kv } from '@vercel/kv';
-import { SEPARATOR } from "@/lib/constants";
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -37,7 +36,9 @@ const retrieveTranslation = async (
           role: "system",
           content:
             `
-Translate the input text to ${language} while preserving the original segment structure. The input text will be separated by this symbol (${SEPARATOR}). Your goal is to maintain the exact number of segments in the output, even if the translated content for some segments is minimal or absent. Make sure to follow these guidelines strictly and avoid combining or skipping segments.
+Translate the input text to ${language}. The input text is contiguous but has been broken up into segments. Each segment is an element in a JSON array. 
+
+Return the translated segments in the same order and the same number of elements. Do not remove any segments. Do not add any segments. You MUST maintain the exact number of segments.
           `.trim(),
         },
         {
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
     const stream = new ReadableStream({
       async start(controller) {
         for (const group of groups) {
-          const text = group.map((segment) => segment.text).join(SEPARATOR);
+          const text = JSON.stringify(group.map((segment) => segment.text));
           const response = await retrieveTranslation(text, language);
           const srtStream = parseStreamedResponse(response);
           const reader = srtStream.getReader();

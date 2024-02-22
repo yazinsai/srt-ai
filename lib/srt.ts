@@ -5,7 +5,8 @@ import {
   createParser,
 } from "eventsource-parser";
 import { encoding_for_model } from "tiktoken";
-import { SEPARATOR } from "./constants";
+import { JSONParser } from '@streamparser/json';
+import type { ParsedElementInfo } from '@streamparser/json';
 
 /**
  * Groups segments into groups of length `length` or less.
@@ -42,12 +43,15 @@ export function groupSegmentsByTokenLength(segments: Segment[], length: number) 
   return groups;
 }
 
+// Ensures that we enqueue full segments only, and not partial segments.
 export function parseStreamedResponse(
   response: any,
 ): ReadableStream {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-  let buffer = "";
+  // Initialize the JSONParser with options tailored for your needs
+  // Here, we're interested in all elements of an array, hence the path '$.*'
+  const parser = new JSONParser({ paths: ['$.*'] });
 
   return new ReadableStream({
     async start(controller) {
@@ -61,34 +65,41 @@ export function parseStreamedResponse(
           return;
         }
 
-        try {
-          const json = JSON.parse(data);
-          const text = json.choices[0]?.delta?.content;
-          if (!text) return;
-          buffer += text;
+        const json = JSON.parse(data);
+        const text = json.choices[0]?.delta.content;
+        if (!text) return;
 
-          // If there's a "|" in the buffer, we can enqueue a segment
-          if (buffer.includes(SEPARATOR)) {
-            const segments = buffer.split(SEPARATOR);
-            segments.slice(0, -1).map(segment => controller.enqueue(encoder.encode(segment)));
-            buffer = segments[segments.length - 1];
-          }
+        // Direct JSON parsing to JSONParser
+        try {
+          parser.write(text); // Feed the data directly to JSONParser
         } catch (e) {
           controller.error(e);
         }
       };
 
-      const parser = createParser(onParse);
+      // Define the callback to process each array element
+      // This function is called whenever a complete array element is parsed
+      parser.onValue = (parsedElementInfo: ParsedElementInfo.ParsedElementInfo) => {
+        // Process the value here
+        // `value` is the parsed JSON array element
+        // Ensure that we're at the root of the JSON structure (stack === 1) to process top-level array elements
+        if (parsedElementInfo.stack.length === 1) {
+          controller.enqueue(encoder.encode(parsedElementInfo.value as string));
+        }
+      };
+
+      parser.onError = (err) => {
+        controller.error(err);
+      };
+
+      const parserFeed = createParser(onParse);
 
       for await (const chunk of response.body as any) {
-        parser.feed(decoder.decode(chunk));
+        parserFeed.feed(decoder.decode(chunk));
       }
 
-      // Enqueue the last segment
-      if (buffer.length) {
-        controller.enqueue(encoder.encode(buffer))
-      }
-
+      // Finalize JSON parsing
+      parser.end();
       controller.close();
     },
   });
