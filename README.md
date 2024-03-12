@@ -17,9 +17,52 @@ Follow these simple steps to set up SRT AI Translator and start enjoying better 
 ### Prerequisites
 
 - An OpenAI API key (grab it [here](https://platform.openai.com/account/api-keys), if you don't have one already)
+
+### Docker
+
+#### Build
+
+To build the Docker image with the name `srt-ai`, use the following command:
+
+```bash
+docker build -t srt-ai .
+```
+
+#### Run
+
+Before running the application, ensure that the environment variable `OPENAI_API_KEY` is set.
+
+##### Using docker run
+
+```
+docker run -p 3000:3000 -e OPENAI_API_KEY=<your_api_key> srt-ai
+```
+
+##### Using docker compose
+
+1. Copy the provided example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Update the .env.local file with your `OPENAI_API_KEY`.
+
+3. Run the application using Docker Compose:
+
+```
+docker compose up
+```
+
+This will read the environment variables from the .env.local file and start the application, exposing it on port 3000.
+
+### Manual
+
+#### Prerequisites
+
 - Node.js and npm installed on your machine
 
-### Installation
+#### Installation
 
 1. Clone the repo `git clone https://github.com/yazinsai/srt-ai`
 2. Rename `.env.example` to `.env.local` and paste your OpenAI Key.
