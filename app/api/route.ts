@@ -12,43 +12,54 @@ export const dynamic = 'force-dynamic' // defaults to auto
 // English to Indian, which is the longest language in terms of token length.
 const MAX_TOKENS_IN_SEGMENT = 700;
 
-const retrieveTranslation = async (
-  text: string,
-  language: string
-) => {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    method: "POST",
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo-0125",
-      max_tokens: 2048,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-      top_p: 1,
-      temperature: 0,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an experienced semantic translator. Follow the instructions carefully.",
+const retrieveTranslation = async (text: string, language: string) => {
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         },
-        {
-          role: "user",
-          content: `Translate this to ${language}. Interleave the "|" segment separator in the response. ALWAYS return the SAME number of segments. NEVER skip any segment. NEVER combine segments.\n\n${text}`,
-        },
-      ],
-      stream: true,
-    }),
-  });
+        method: "POST",
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 4096,
+          messages: [
+            {
+              role: "system",
+              content: "You are an experienced semantic translator, specialized in creating SRT files. Separate translation segments with the '|' symbol",
+            },
+            {
+              "role": "user",
+              "content": `Translate this to ${language}: ${text}`
+            }
+          ],
+          stream: true,
+        }),
+      });
 
-  if (response.status !== 200) {
-    throw new Error("OpenAI API returned an error");
+      if (response.status === 429) {
+        // Log the rate limit error and retry after a delay
+        console.warn("Rate limit exceeded, retrying...");
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Retry after 1 second
+        retries--;
+        continue; // Retry the request
+      }
+
+      if (response.status !== 200) {
+        const errorMessage = await response.json();
+        throw new Error(`OpenAI API returned an error: ${errorMessage.message}`);
+      }
+
+      return response;
+    } catch (error) {
+      if (retries <= 0) {
+        console.error("Error in retrieveTranslation after retries:", error);
+        throw new Error("Translation request failed after multiple retries.");
+      }
+    }
   }
-
-  return response;
 };
 
 export async function POST(request: Request) {
@@ -68,23 +79,27 @@ export async function POST(request: Request) {
           const response = await retrieveTranslation(text, language);
           const srtStream = parseStreamedResponse(response);
           const reader = srtStream.getReader();
-
+    
           while (true) {
             const { done, value } = await reader.read();
             if (done) {
               break;
             }
-
+    
             const timestamp = segments[index].timestamp;
             const decoded = decoder.decode(value);
-            const srt = [++index, timestamp, decoded].join("\n")
+    
+            // Debugging output
+            console.log("Decoded value:", decoded);
+    
+            const srt = [++index, timestamp, decoded].join("\n");
             controller.enqueue(encoder.encode(srt));
           }
         }
-
+    
         controller.close();
       }
-    });
+    });    
 
     return new Response(stream);
   } catch (error) {
