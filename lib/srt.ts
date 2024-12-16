@@ -13,7 +13,7 @@ export function groupSegmentsByTokenLength(segments: Segment[], length: number) 
   const groups: Segment[][] = [];
   let currentGroup: Segment[] = [];
   let currentGroupTokenCount = 0;
-  const encoder = encoding_for_model("gpt-3.5-turbo");
+  const encoder = encoding_for_model("gpt-4o-mini");
 
   function numTokens(text: string) {
     const tokens = encoder.encode(text);
@@ -41,9 +41,7 @@ export function groupSegmentsByTokenLength(segments: Segment[], length: number) 
   return groups;
 }
 
-export function parseStreamedResponse(
-  response: any,
-): ReadableStream {
+export function parseStreamedResponse(response: any): ReadableStream {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -61,7 +59,12 @@ export function parseStreamedResponse(
         }
 
         try {
+          // Log the raw data received from OpenAI
+          console.log("Raw data received:", data);
+
           const json = JSON.parse(data);
+          console.log("Parsed JSON:", json); // Log parsed JSON
+
           const text = json.choices[0]?.delta?.content;
           if (!text) return;
           buffer += text;
@@ -69,10 +72,13 @@ export function parseStreamedResponse(
           // If there's a "|" in the buffer, we can enqueue a segment
           if (buffer.includes("|")) {
             const segments = buffer.split("|");
-            segments.slice(0, -1).map(segment => controller.enqueue(encoder.encode(segment)));
-            buffer = segments[segments.length - 1];
+            segments.slice(0, -1).forEach(segment => {
+              controller.enqueue(encoder.encode(segment));
+            });
+            buffer = segments[segments.length - 1]; // Keep the remaining text
           }
         } catch (e) {
+          console.error("Error parsing response:", e); // Log errors during parsing
           controller.error(e);
         }
       };
@@ -80,15 +86,18 @@ export function parseStreamedResponse(
       const parser = createParser(onParse);
 
       for await (const chunk of response.body as any) {
-        parser.feed(decoder.decode(chunk));
+        const decodedChunk = decoder.decode(chunk);
+        console.log("Raw chunk received:", decodedChunk); // Log each raw chunk received
+        parser.feed(decodedChunk); // Feed the chunk into the parser
       }
 
-      // Enqueue the last segment
-      if (buffer.length) {
-        controller.enqueue(encoder.encode(buffer))
+      // Process any remaining buffer content
+      if (buffer.length > 0) {
+        console.log("Final buffer content:", buffer); // Log any final buffer content
+        controller.enqueue(encoder.encode(buffer));
       }
 
       controller.close();
     },
   });
-};
+}
