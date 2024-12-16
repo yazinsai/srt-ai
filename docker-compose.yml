@@ -1,0 +1,8 @@
+version: '3'
+services:
+  srt-ai:
+    image: srt-ai
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
