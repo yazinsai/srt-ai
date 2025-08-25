@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:openrouter.ai)",
+      "WebSearch",
+      "Bash(npm uninstall:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

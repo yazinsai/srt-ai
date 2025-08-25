@@ -25,6 +25,7 @@ export default function ({ id }: { id: string }) {
 	const [status, setStatus] = React.useState<"idle" | "busy" | "done">("busy");
 	const [translatedSrt, setTranslatedSrt] = React.useState("");
 	const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
+	const [progress, setProgress] = React.useState(0);
 	const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 	const [isUserScrolling, setIsUserScrolling] = React.useState(false);
 
@@ -127,22 +128,54 @@ export default function ({ id }: { id: string }) {
 		function parseChunk(chunkStr: string): Chunk {
 			const { id, timestamp, text } = parseSegment(chunkStr);
 			const { start, end } = parseTimestamp(timestamp);
-			return { index: id.toString(), start, end, text };
+			return { index: id.toString(), start: start || '', end: end || '', text };
 		}
 
 		while (!doneReading) {
 			const { value, done } = await reader.read();
 			doneReading = done;
-			const chunk = decoder.decode(value);
+			if (value) {
+				const chunk = decoder.decode(value);
 
-			// Split chunks by double newlines and process each segment
-			const segments = chunk.split(/\r\n\r\n|\n\n/).filter(Boolean);
+				// Extract all progress updates from the chunk
+				const progressMatches = chunk.matchAll(/\[PROGRESS:(\d+)\]/g);
+				for (const match of progressMatches) {
+					if (match[1]) {
+						const newProgress = parseInt(match[1]);
+						setProgress(newProgress);
+						console.log('Progress update:', newProgress + '%');
+					}
+				}
 
-			for (const segment of segments) {
-				if (segment.trim().length) {
-					content += `${segment}\n\n`;
-					setTranslatedSrt((prev) => `${prev}${segment}\n\n`);
-					setTranslatedChunks((prev) => [...prev, parseChunk(segment)]);
+				// Check for errors
+				const errorMatch = chunk.match(/\[ERROR:(.*?)\]/);
+				if (errorMatch && errorMatch[1]) {
+					console.error('Translation error:', errorMatch[1]);
+					setStatus('idle');
+					return '';
+				}
+
+				// Remove progress and error markers, then process SRT content
+				const srtContent = chunk
+					.replace(/\[PROGRESS:\d+\]\n?/g, '')
+					.replace(/\[ERROR:.*?\]\n?/g, '');
+
+				if (srtContent.trim()) {
+					content += srtContent;
+					setTranslatedSrt((prev) => prev + srtContent);
+
+					// Parse SRT chunks
+					const segments = srtContent.split(/\r\n\r\n|\n\n/).filter(Boolean);
+					for (const segment of segments) {
+						if (segment.trim() && segment.includes('-->')) {
+							try {
+								const parsedChunk = parseChunk(segment);
+								setTranslatedChunks((prev) => [...prev, parsedChunk]);
+							} catch (err) {
+								console.error('Error parsing chunk:', err);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -174,8 +207,8 @@ export default function ({ id }: { id: string }) {
 							</a>
 						</p>
 						<ProgressBar
-							value={translatedChunks.length}
-							max={originalSegments.length}
+							value={progress}
+							max={100}
 						/>
 					</div>
 					<div className="flex-1 bg-neutral-50 py-8 h-full w-full">
@@ -192,7 +225,7 @@ export default function ({ id }: { id: string }) {
 									)}
 								>
 									<div className="flex-1 text-right">
-										{originalSegments[i].text}
+										{originalSegments[i]?.text || ''}
 									</div>
 									<div className="flex-1">{chunk.text}</div>
 								</div>
@@ -223,14 +256,19 @@ function formatPercent(value: number) {
 }
 
 function ProgressBar({ value, max }: { value: number; max: number }) {
-	const progress = value > 0 ? value / max : 0;
+	const progress = Math.min(value / max, 1);
 
 	return (
-		<div className="my-12 w-full rounded-full bg-neutral-50 h-12 p-2">
-			<div
-				style={{ width: formatPercent(progress) }}
-				className="bg-gradient-to-r from-[#1B9639] to-[#3DDC63] rounded-l-full rounded-r-sm h-full"
-			/>
+		<div className="w-full my-8">
+			<div className="rounded-full bg-neutral-50 h-12 p-2">
+				<div
+					style={{ width: `${Math.max(1, progress * 100)}%` }}
+					className="bg-gradient-to-r from-[#1B9639] to-[#3DDC63] rounded-l-full rounded-r-sm h-full transition-all duration-300 ease-out"
+				/>
+			</div>
+			<p className="text-center mt-2 text-sm text-neutral-600">
+				{Math.round(progress * 100)}% complete
+			</p>
 		</div>
 	);
 }

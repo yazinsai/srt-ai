@@ -1,7 +1,7 @@
 import type { Segment } from "@/types";
 import { createParser } from "eventsource-parser";
 import type { ParsedEvent, ReconnectInterval } from "eventsource-parser";
-import { google } from "@ai-sdk/google";
+// Google SDK import removed - now using OpenRouter in route.ts
 import { JSONParser } from "@streamparser/json";
 
 /**

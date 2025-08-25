@@ -152,6 +152,7 @@ const SrtForm: React.FC = () => {
 
 		if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
 			const droppedFile = e.dataTransfer.files[0];
+			if (!droppedFile) return;
 
 			// Make sure the file extension is ".srt"
 			const fileName = droppedFile.name;
@@ -185,7 +186,10 @@ const SrtForm: React.FC = () => {
 				type="file"
 				ref={fileElement}
 				accept=".srt"
-				onChange={(e) => updateFile(e.target.files![0])}
+				onChange={(e) => {
+					const file = e.target.files?.[0];
+					if (file) updateFile(file);
+				}}
 				className="hidden"
 			/>
 
@@ -366,13 +370,14 @@ function findLastTimestampFromSRT(content: string) {
 
 	// Find the last timestamp with a valid id
 	for (let i = segments.length - 1; i > 0; i--) {
-		if (!segments[i] || segments[i].trim().length === 0) continue; // skip empty lines (e.g. at the end of the file
+		const segment = segments[i];
+		if (!segment || segment.trim().length === 0) continue; // skip empty lines (e.g. at the end of the file
 
-		const { id, timestamp } = parseSegment(segments[i]);
+		const { id, timestamp } = parseSegment(segment);
 		if (isNaN(id)) continue;
 
 		const [start, end] = timestamp.split(" --> ");
-		return end.trim();
+		if (end) return end.trim();
 	}
 
 	throw new Error("No valid timestamp found");
@@ -381,7 +386,9 @@ function findLastTimestampFromSRT(content: string) {
 function timestampToSeconds(timestamp: string) {
 	// convert hh:mm:ss,mmm to seconds
 	const [hh, mm, ss] = timestamp.split(":");
+	if (!ss) return 0;
 	const [ss2, mmm] = ss.split(",");
+	if (!ss2 || !mmm || !hh || !mm) return 0;
 	return (
 		parseInt(hh) * 3600 +
 		parseInt(mm) * 60 +

@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { kv } from "@vercel/kv";
 
 export async function POST(request: NextRequest) {
-	const headersList = headers();
+	const headersList = await headers();
 	const origin = headersList.get("origin");
 
 	// TODO: Calculate seconds, instead of reading it (vulnerable to manipulation)

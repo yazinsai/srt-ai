@@ -9,9 +9,10 @@ interface URLSearchParams {
   success?: boolean;
 }
 
-export default async function Page({ searchParams }: { searchParams: URLSearchParams }) {
+export default async function Page({ searchParams }: { searchParams: Promise<URLSearchParams> }) {
   // Retrieve the Stripe session
-  const id = searchParams.id
+  const params = await searchParams;
+  const id = params.id
   const value = await kv.get<any>(id)
   if (!value) {
     return (
