@@ -40,11 +40,13 @@ The input contains numbered subtitles in format: [1] text | [2] text | [3] text
 
 CRITICAL RULES:
 1. Output MUST have the EXACT SAME numbered format: [1] translation | [2] translation | [3] translation
-2. NEVER skip any number
+2. NEVER skip any number - maintain the exact sequence [1], [2], [3], etc.
 3. NEVER combine segments
 4. Keep ALL numbers in sequence
 5. If you can't translate a segment, output: [N] [UNTRANSLATABLE]
 6. Keep translations concise (max 2 lines)
+7. ALWAYS include the [N] number prefix for each translation
+8. Use the pipe separator | between translations
 
 Example:
 Input: "[1] Hello | [2] How are you? | [3] I'm fine"
@@ -198,15 +200,42 @@ export async function POST(request: Request) {
 								}
 							} else {
 								// Parse numbered format: [1] translation | [2] translation | etc
-								const translatedSegments = translatedText.split("|").map(s => {
+								const translatedSegments = translatedText.split("|").map((s, segmentIndex) => {
 									// Extract text after [N] prefix - handle both with and without brackets
 									const trimmed = s.trim();
-									// Try to match [N] at the beginning
-									const match = trimmed.match(/^\[\d+\]\s*(.*)$/);
+									const originalTrimmed = trimmed; // Keep for debugging
+									
+									// Try multiple regex patterns to catch different formats
+									// Pattern 1: [N] text
+									let match = trimmed.match(/^\[\d+\]\s*(.*)$/);
 									if (match && match[1]) {
+										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern [N] - extracted: "${match[1].trim()}"`);
 										return match[1].trim();
 									}
+									
+									// Pattern 2: N. text (in case AI uses periods instead of brackets)
+									match = trimmed.match(/^\d+\.\s*(.*)$/);
+									if (match && match[1]) {
+										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern N. - extracted: "${match[1].trim()}"`);
+										return match[1].trim();
+									}
+									
+									// Pattern 3: N) text (in case AI uses parentheses)
+									match = trimmed.match(/^\d+\)\s*(.*)$/);
+									if (match && match[1]) {
+										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern N) - extracted: "${match[1].trim()}"`);
+										return match[1].trim();
+									}
+									
+									// Pattern 4: Remove any leading number followed by various separators
+									match = trimmed.match(/^\d+[\]\)\.\-\:\s]+(.*)$/);
+									if (match && match[1]) {
+										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern N[sep] - extracted: "${match[1].trim()}"`);
+										return match[1].trim();
+									}
+									
 									// If no match, return as is (already translated without number)
+									console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: No pattern matched, using as-is: "${originalTrimmed}"`);
 									return trimmed;
 								});
 								

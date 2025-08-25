@@ -76,8 +76,8 @@ export class SRTParser {
         startTime: subtitle.startTime,
         endTime: subtitle.endTime,
         text: subtitle.text,
-        startSeconds: subtitle.start,
-        endSeconds: subtitle.end,
+        startSeconds: subtitle.start ?? this.timeToSeconds(subtitle.startTime),
+        endSeconds: subtitle.end ?? this.timeToSeconds(subtitle.endTime),
       }))
       
       return this.parser.toSrt(srtArray)
