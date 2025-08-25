@@ -37,7 +37,7 @@ function FeatureSections() {
     <div className="flex flex-col gap-y-16">
       <div className="flex flex-row gap-x-12 items-center">
         <div className="flex-1">
-          <img src="/book-open.png" className="w-full" />
+          <img src="/book-open.png" className="w-full" alt="Book open illustration" />
         </div>
         <div className="flex-1">
           <h2 className="text-4xl font-bold text-neutral-800">From any language, to any language.</h2>
@@ -47,7 +47,7 @@ function FeatureSections() {
 
       <div className="flex flex-row md:flex-row-reverse gap-x-12 items-center">
         <div className="flex-1">
-          <img src="/better-ga.png" className="w-full p-6" />
+          <img src="/better-ga.png" className="w-full p-6" alt="Better than Google Translate comparison" />
         </div>
         <div className="flex-1">
           <h2 className="text-4xl font-bold text-neutral-800">Infinitely better than Google Translate.</h2>
@@ -57,11 +57,11 @@ function FeatureSections() {
 
       <div className="flex flex-row gap-x-12 items-center">
         <div className="flex-1">
-          <img src="/pricing.png" className="w-full p-6" />
+          <img src="/pricing.png" className="w-full p-6" alt="Pricing comparison chart" />
         </div>
         <div className="flex-1">
           <h2 className="text-4xl font-bold text-neutral-800">Unbeatable price: just $1/hr</h2>
-          <p className="mt-6 text-neutral-600 leading-relaxed">Most tools charge several $'s per minute, and then a little extra for tracking the timestamps. Our pricing is simple: just $1/hour.</p>
+          <p className="mt-6 text-neutral-600 leading-relaxed">Most tools charge several $&apos;s per minute, and then a little extra for tracking the timestamps. Our pricing is simple: just $1/hour.</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react/no-unescaped-entities */
 
 import React from "react";
 
@@ -21,7 +22,7 @@ const triggerFileDownload = (filename: string, content: string) => {
 	element.click();
 };
 
-export default function ({ id }: { id: string }) {
+const TranslatePage = function ({ id }: { id: string }) {
 	const [status, setStatus] = React.useState<"idle" | "busy" | "done">("busy");
 	const [translatedSrt, setTranslatedSrt] = React.useState("");
 	const [translatedChunks, setTranslatedChunks] = React.useState<Chunk[]>([]);
@@ -32,7 +33,7 @@ export default function ({ id }: { id: string }) {
 	// Original content
 	const [originalSegments, setOriginalSegments] = React.useState<Segment[]>([]);
 
-	async function fetchContent() {
+	const fetchContent = React.useCallback(async () => {
 		try {
 			const response = await fetch("/api/content", {
 				method: "POST",
@@ -47,10 +48,10 @@ export default function ({ id }: { id: string }) {
 				error,
 			);
 		}
-	}
+	}, [id]);
 
 	// TODO: When the job is done, cache it in KV so we don't have to pay on page refresh
-	async function submit() {
+	const submit = React.useCallback(async () => {
 		try {
 			setStatus("busy");
 			const response = await fetch("/api", {
@@ -80,12 +81,12 @@ export default function ({ id }: { id: string }) {
 				error,
 			);
 		}
-	}
+	}, [id]);
 
 	React.useEffect(() => {
 		submit();
 		fetchContent();
-	}, []);
+	}, [fetchContent, submit]);
 
 	const handleUserScroll = () => {
 		if (scrollContainerRef.current) {
@@ -224,9 +225,9 @@ export default function ({ id }: { id: string }) {
 										i % 2 == 0 ? `bg-neutral-50` : "bg-white",
 									)}
 								>
-									<div className="flex-1 text-right">
-										{originalSegments[i]?.text || ''}
-									</div>
+					<div className="flex-1 text-right">
+						{originalSegments[i]?.text || ''}
+					</div>
 									<div className="flex-1">{chunk.text}</div>
 								</div>
 							))}
@@ -244,12 +245,16 @@ export default function ({ id }: { id: string }) {
 					>
 						Done!
 					</h1>
-					<p>(Check your "Downloads" folder 🍿)</p>
+					<p>(Check your &quot;Downloads&quot; folder 🍿)</p>
 				</div>
 			)}
 		</main>
 	);
-}
+};
+
+TranslatePage.displayName = 'TranslatePage';
+
+export default TranslatePage;
 
 function formatPercent(value: number) {
 	return `${Math.round(value * 100)}%`;
