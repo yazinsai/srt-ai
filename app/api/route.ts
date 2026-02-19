@@ -12,7 +12,7 @@ const retrieveTranslation = async (text: string, language: string) => {
 	while (retries > 0) {
 		try {
 			const { text: translatedText } = await generateText({
-				model: google("gemini-2.0-flash-exp"),
+				model: google("gemini-2.5-flash-lite"),
 				messages: [
 					{
 						role: "system",
