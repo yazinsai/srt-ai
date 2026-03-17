@@ -14,7 +14,8 @@ const LANGUAGES = [
 	"English",
 	"Hindi",
 	"Bengali",
-	"Portuguese",
+	"Portuguese (Brazil)",
+	"Portuguese (Portugal)",
 	"Russian",
 	"Japanese",
 	"Punjabi",
@@ -190,7 +191,7 @@ const SrtForm: React.FC = () => {
 					const file = e.target.files?.[0];
 					if (file) updateFile(file);
 				}}
-				className="hidden"
+				className="sr-only"
 			/>
 
 			{!file && (

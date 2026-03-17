@@ -4,12 +4,12 @@ import type { Chunk } from "@/types";
 
 const Timestamp: FC<Chunk> = ({ index, start, end, text }) => {
   const formatTimestamp = (timestamp: string) => {
-    let [hours, minutes, secondsWithMs] = timestamp.split(":");
-    if (!secondsWithMs) return '00:00.0';
-    const [seconds, ms] = secondsWithMs.split(",");
-    if (!ms) return '00:00.0';
-
-    return `${minutes}:${seconds}.${ms[0] || '0'}`;
+    if (!timestamp) return '00:00.0';
+    const parts = timestamp.split(":");
+    if (parts.length < 3) return timestamp;
+    const [hours, minutes, secondsWithMs] = parts;
+    const [seconds, ms] = (secondsWithMs || "0,0").split(",");
+    return `${minutes}:${seconds}.${(ms || "0")[0]}`;
   };
 
   return (

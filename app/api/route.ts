@@ -199,67 +199,47 @@ export async function POST(request: Request) {
 									processedCount++;
 								}
 							} else {
-								// Parse numbered format: [1] translation | [2] translation | etc
-								const translatedSegments = translatedText.split("|").map((s, segmentIndex) => {
-									// Extract text after [N] prefix - handle both with and without brackets
+								// Parse numbered format and build index map for reliable matching
+								const rawSegments = translatedText.split("|");
+								const translationMap = new Map<number, string>();
+
+								for (const s of rawSegments) {
 									const trimmed = s.trim();
-									const originalTrimmed = trimmed; // Keep for debugging
-									
-									// Try multiple regex patterns to catch different formats
-									// Pattern 1: [N] text
-									let match = trimmed.match(/^\[\d+\]\s*(.*)$/);
-									if (match && match[1]) {
-										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern [N] - extracted: "${match[1].trim()}"`);
-										return match[1].trim();
+									if (!trimmed) continue;
+
+									// Extract [N] number and text
+									const match = trimmed.match(/^\[(\d+)\]\s*(.*)$/)
+										|| trimmed.match(/^(\d+)\.\s*(.*)$/)
+										|| trimmed.match(/^(\d+)\)\s*(.*)$/)
+										|| trimmed.match(/^(\d+)[\]\)\.\-\:\s]+(.*)$/);
+
+									if (match && match[1] && match[2]) {
+										translationMap.set(parseInt(match[1]), match[2].trim());
+									} else {
+										// Positional fallback: assign to next unassigned index
+										const nextIdx = translationMap.size + 1;
+										translationMap.set(nextIdx, trimmed);
 									}
-									
-									// Pattern 2: N. text (in case AI uses periods instead of brackets)
-									match = trimmed.match(/^\d+\.\s*(.*)$/);
-									if (match && match[1]) {
-										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern N. - extracted: "${match[1].trim()}"`);
-										return match[1].trim();
-									}
-									
-									// Pattern 3: N) text (in case AI uses parentheses)
-									match = trimmed.match(/^\d+\)\s*(.*)$/);
-									if (match && match[1]) {
-										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern N) - extracted: "${match[1].trim()}"`);
-										return match[1].trim();
-									}
-									
-									// Pattern 4: Remove any leading number followed by various separators
-									match = trimmed.match(/^\d+[\]\)\.\-\:\s]+(.*)$/);
-									if (match && match[1]) {
-										console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: Matched pattern N[sep] - extracted: "${match[1].trim()}"`);
-										return match[1].trim();
-									}
-									
-									// If no match, return as is (already translated without number)
-									console.log(`Batch ${batchNumber}, Segment ${segmentIndex + 1}: No pattern matched, using as-is: "${originalTrimmed}"`);
-									return trimmed;
-								});
-								
-								console.log(`Batch ${batchNumber}: Received ${translatedSegments.length} translations for ${batch.length} segments`);
-								
-								// Log if there's a mismatch
-								if (translatedSegments.length !== batch.length) {
-									console.warn(`Batch ${batchNumber}: Translation count mismatch! Expected ${batch.length}, got ${translatedSegments.length}`);
-									console.log(`Full response: ${translatedText}`);
 								}
-								
+
+								console.log(`Batch ${batchNumber}: Received ${translationMap.size} translations for ${batch.length} segments`);
+
+								if (translationMap.size !== batch.length) {
+									console.warn(`Batch ${batchNumber}: Translation count mismatch! Expected ${batch.length}, got ${translationMap.size}`);
+								}
+
 								for (let i = 0; i < batch.length; i++) {
 									const subtitle = batch[i];
-									// Use translated segment if available, otherwise fallback to original
-									let translatedText = translatedSegments[i];
-									
-									// Check if translation is missing or marked as untranslatable
-									if (!translatedText || translatedText === '[UNTRANSLATABLE]' || translatedText === '') {
-										translatedText = `[UNTRANSLATED] ${subtitle?.text || ''}`;
-										console.warn(`Batch ${batchNumber}, Segment ${i+1}: No translation for subtitle ${subtitle?.id}`);
+									// Look up by 1-based index from the [N] prefix
+									let translated = translationMap.get(i + 1);
+
+									if (!translated || translated === '[UNTRANSLATABLE]' || translated === '') {
+										translated = subtitle?.text || '';
+										console.warn(`Batch ${batchNumber}, Segment ${i+1}: No translation for subtitle ${subtitle?.id}, using original`);
 									}
-									
+
 									if (subtitle) {
-										const srt = `${subtitle.id}\n${subtitle.startTime} --> ${subtitle.endTime}\n${translatedText}\n\n`;
+										const srt = `${subtitle.id}\n${subtitle.startTime} --> ${subtitle.endTime}\n${translated}\n\n`;
 										controller.enqueue(encoder.encode(srt));
 										processedCount++;
 									}
