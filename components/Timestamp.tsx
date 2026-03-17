@@ -10,10 +10,12 @@ const Timestamp: FC<Chunk & { originalText?: string }> = ({
 	originalText,
 }) => {
 	const formatTimestamp = (timestamp: string) => {
-		let [hours, minutes, secondsWithMs] = timestamp.split(":");
-		const [seconds, ms] = secondsWithMs.split(",");
-
-		return `${minutes}:${seconds}.${ms[0]}`;
+		if (!timestamp) return "0:00.0";
+		const parts = timestamp.split(":");
+		if (parts.length < 3) return timestamp;
+		const [hours, minutes, secondsWithMs] = parts;
+		const [seconds, ms] = (secondsWithMs || "0,0").split(",");
+		return `${minutes}:${seconds}.${(ms || "0")[0]}`;
 	};
 
 	return (

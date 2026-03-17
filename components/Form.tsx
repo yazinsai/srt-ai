@@ -11,7 +11,7 @@ function classNames(...classes: any[]) {
 }
 
 const LANGUAGES = [
-  'Traditional Chinese', 'Simplified Chinese', 'Spanish', 'English', 'Hindi', 'Bengali', 'Portuguese', 'Russian',
+  'Traditional Chinese', 'Simplified Chinese', 'Spanish', 'English', 'Hindi', 'Bengali', 'Portuguese (Brazil)', 'Portuguese (Portugal)', 'Russian',
   'Japanese', 'Punjabi', 'Marathi', 'Telugu', 'Wu Chinese', 'Turkish', 'Korean',
   'French', 'German', 'Vietnamese', 'Tamil', 'Yue Chinese', 'Urdu', 'Javanese', 'Italian', 'Icelandic',
   'Arabic', 'Gujarati', 'Persian', 'Bhojpuri', 'Min Nan', 'Hakka',
@@ -103,7 +103,7 @@ const SrtForm: React.FC<Props> = ({ onSubmit }) => {
           type="file"
           accept=".srt"
           onChange={(e) => setFile(e.target.files![0])}
-          className="absolute inset-0 opacity-0 cursor-pointer"
+          className="absolute inset-0 z-10 opacity-0 cursor-pointer"
         />
         <div
           className={classNames(
