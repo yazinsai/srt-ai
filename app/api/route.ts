@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const MAX_TOKENS_IN_SEGMENT = 700;
 
-const retrieveTranslation = async (text: string, language: string) => {
+const retrieveTranslation = async (text: string, language: string, expectedCount: number) => {
 	let retries = 3;
 	while (retries > 0) {
 		try {
@@ -17,11 +17,15 @@ const retrieveTranslation = async (text: string, language: string) => {
 					{
 						role: "system",
 						content:
-							"You are an experienced semantic translator, specialized in creating SRT files. Separate translation segments with the '|' symbol",
+							"You are an experienced semantic translator for SRT subtitle files. CRITICAL RULES:\n" +
+							"1. Separate each translated segment with the '|' symbol.\n" +
+							"2. You MUST output EXACTLY the same number of segments as the input. Do NOT merge or split segments.\n" +
+							"3. Each input segment separated by '|' must produce exactly one output segment separated by '|'.\n" +
+							"4. Preserve the one-to-one mapping between input and output segments.",
 					},
 					{
 						role: "user",
-						content: `Translate this to ${language}: ${text}`,
+						content: `Translate these ${expectedCount} subtitle segments to ${language}. Output exactly ${expectedCount} segments separated by '|':\n${text}`,
 					},
 				],
 			});
@@ -53,16 +57,17 @@ export async function POST(request: Request) {
 			async start(controller) {
 				for (const group of groups) {
 					const text = group.map((segment) => segment.text).join("|");
-					const translatedText = await retrieveTranslation(text, language);
+					const translatedText = await retrieveTranslation(text, language, group.length);
 					if (!translatedText) continue;
 
-					const translatedSegments = translatedText.split("|");
-					for (const segment of translatedSegments) {
-						if (segment.trim()) {
-							const originalSegment = segments[currentIndex];
-							const srt = `${++currentIndex}\n${originalSegment?.timestamp || ""}\n${segment.trim()}\n\n`;
-							controller.enqueue(encoder.encode(srt));
-						}
+					const translatedSegments = translatedText.split("|").map(s => s.trim()).filter(Boolean);
+
+					// Ensure 1:1 mapping: pad or truncate to match original group size
+					for (let i = 0; i < group.length; i++) {
+						const originalSegment = segments[currentIndex];
+						const translated = translatedSegments[i] || originalSegment?.text || "";
+						const srt = `${++currentIndex}\n${originalSegment?.timestamp || ""}\n${translated}\n\n`;
+						controller.enqueue(encoder.encode(srt));
 					}
 				}
 				controller.close();
